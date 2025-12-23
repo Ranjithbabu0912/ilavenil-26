@@ -1,74 +1,137 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react';
-import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
+import { toast } from "react-toastify";
 
 const Navbar = ({ onOpenStatus }) => {
-
     const navigate = useNavigate();
-    const { user } = useUser();
     const { openSignIn } = useClerk();
+    const { user, isLoaded, isSignedIn } = useUser();
 
     const [registered, setRegistered] = useState(false);
+    const [paymentStatus, setPaymentStatus] = useState(null);
+    const [registrationId, setRegistrationId] = useState(null);
 
+    const userEmail = user?.primaryEmailAddress?.emailAddress || null;
+
+    // 🔍 Check registration + payment status
     useEffect(() => {
-        const email = localStorage.getItem("registeredEmail");
-        if (email) {
-            setRegistered(true);
+        if (!isLoaded || !userEmail) return;
+
+        const fetchStatus = async () => {
+            try {
+                const res = await fetch(
+                    "http://localhost:5000/api/events/check-status",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: userEmail }),
+                    }
+                );
+
+                const data = await res.json();
+
+                if (data.success) {
+                    setRegistered(true);
+                    setPaymentStatus(data.status);
+                    setRegistrationId(data.registrationId);
+                } else {
+                    setRegistered(false);
+                }
+            } catch {
+                toast.error("Unable to fetch payment status");
+            }
+        };
+
+        fetchStatus();
+    }, [isLoaded, userEmail]);
+
+    /* ================== BUTTON HANDLERS ================== */
+
+    const handleRegister = () => navigate("/RegistrationForm");
+
+    const handlePayment = () => {
+        if (!registrationId) {
+            toast.error("Registration not found");
+            return;
         }
-    }, []);
+        navigate(`/payment/${registrationId}`);
+    };
+
+    /* ================== RENDER ================== */
 
     return (
-        <div className='fixed top-0 z-5 w-full backdrop-blur-2xl flex justify-between items-center py-8 px-4 sm:px-20 xl:px-32'>
+        <div className="fixed top-0 z-999 w-full backdrop-blur-3xl flex justify-between items-center py-8 px-4 sm:px-20 xl:px-32">
 
-            <h1 className='text-sm md:text-xl lg:text-2xl xl:text-3xl cursor-pointer logo-text text-gray-800' onClick={() => navigate('/')}>ILAVENIL'26</h1>
+            <h1
+                className="text-sm md:text-xl lg:text-2xl xl:text-3xl cursor-pointer logo-text text-gray-800"
+                onClick={() => navigate("/")}
+            >
+                ILAVENIL'26
+            </h1>
 
-            <div className='hidden md:block'>
-                <nav>
-                    <ul className='flex gap-10'>
-                        <li className='cursor-pointer ' onClick={() => navigate('/about')}>About</li>
-                        <li className='cursor-pointer ' onClick={() => navigate('/events')}>Events</li>
-                        <li className='cursor-pointer ' onClick={() => navigate('/contact')}>Contact</li>
-                    </ul>
-                </nav>
-            </div>
+            <nav className="hidden md:block">
+                <ul className="flex gap-10">
+                    <li onClick={() => navigate("/about")} className="cursor-pointer">About</li>
+                    <li onClick={() => navigate("/events")} className="cursor-pointer">Events</li>
+                    <li onClick={() => navigate("/contact")} className="cursor-pointer">Contact</li>
+                </ul>
+            </nav>
 
-            <div className='flex gap-3'>
-                {
-                    user ? <UserButton /> : (
-                        <button
-                            className='md:px-5 md:py-3 px-3 py-2 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer text-[10px] md:text-sm flex items-center md:gap-2 bg-primary text-white hover:shadow-2xl'
-                            onClick={openSignIn}
-                        >
-                            Sign In <ArrowRight className='h-3 md:h-5' />
-                        </button>
-                    )
-                }
-                {
-                    user && !registered ? (
-                        <button
-                            className='md:px-5 md:py-3 px-3 py-2 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer text-[10px] md:text-sm flex items-center md:gap-2 bg-primary text-white hover:shadow-2xl'
-                            onClick={() => navigate('/RegistrationForm')}
-                        >
-                            Register Now <ArrowRight className='h-3 md:h-5' />
-                        </button>
+            <div className="flex gap-3">
 
-                    ) : ""
-                }
-                {user && registered ? (
+                {/* 🔐 Login */}
+                {!isSignedIn && (
                     <button
-                        onClick={onOpenStatus}
-                        className="md:px-5 md:py-3 px-3 py-2 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer text-[10px] md:text-sm flex items-center md:gap-2 bg-primary text-white hover:shadow-2xl"
+                        onClick={openSignIn}
+                        className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white flex items-center gap-2 cursor-pointer"
                     >
-                        Check Status
+                        Sign In <ArrowRight className="h-4" />
                     </button>
-                ) : ""
-                }
+                )}
+
+                {/* 📝 Not Registered */}
+                {isSignedIn && !registered && (
+                    <button
+                        onClick={handleRegister}
+                        className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white flex items-center gap-2 cursor-pointer"
+                    >
+                        Register Now <ArrowRight className="h-4" />
+                    </button>
+                )}
+
+                {/* 💳 Registered but NOT PAID */}
+                {isSignedIn &&
+                    registered &&
+                    (paymentStatus === "NOT_PAID" ||
+                        paymentStatus === "REJECTED") && (
+                        <button
+                            onClick={handlePayment}
+                            className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white flex items-center gap-2 cursor-pointer"
+                        >
+                            Proceed to Payment <ArrowRight className="h-4" />
+                        </button>
+                    )}
+
+                {/* ⏳ Payment submitted / approved */}
+                {isSignedIn &&
+                    registered &&
+                    (paymentStatus === "PENDING" ||
+                        paymentStatus === "APPROVED") && (
+                        <button
+                            onClick={onOpenStatus}
+                            className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white cursor-pointer"
+                        >
+                            Check Status
+                        </button>
+                    )}
+
+                {isSignedIn && <UserButton />}
+
             </div>
-
-
         </div>
-    )
-}
+    );
+};
 
-export default Navbar
+export default Navbar;

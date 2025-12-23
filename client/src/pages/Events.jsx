@@ -1,11 +1,15 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
-
+import { eventDetails } from '../assets/assets'
+import { useNavigate } from 'react-router-dom'
+import EventTile from '../components/EventTile'
 const Events = () => {
+
+    const navigate = useNavigate();
+
+
     return (
-        <div>
-            <Navbar />
-            <h1 className='mt-30'>Events</h1>
+        <div className='mt-28'>
+            <EventTile />
         </div>
     )
 }

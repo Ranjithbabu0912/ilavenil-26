@@ -1,0 +1,72 @@
+.creative-loader-wrapper {
+    position: fixed;
+    inset: 0;
+    background: #020617;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    z-index: 9999;
+}
+
+/* WORD */
+.word {
+    display: flex;
+    font-size: 86px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    color: white;
+}
+
+.word span {
+    display: inline-block;
+    font-weight: normal;
+    animation: assemble 2.6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.12s);
+}
+
+/* SUB TEXT */
+.sub {
+    font-size: 13px;
+    color: #94a3b8;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* KEYFRAMES */
+@keyframes assemble {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) rotate(-20deg) scale(0.6);
+        filter: blur(6px);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(0) rotate(0) scale(1);
+        filter: blur(0);
+    }
+    
+    80% {
+        opacity: 1;
+        transform: translateY(0) rotate(0) scale(1);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-40px) rotate(20deg) scale(0.6);
+        filter: blur(6px);
+    }
+}
+
+@media screen and (max-width:480px) {
+    .word {
+        font-size: x-large;
+    }
+
+    .sub {
+        font-size: 7px;
+    }
+}

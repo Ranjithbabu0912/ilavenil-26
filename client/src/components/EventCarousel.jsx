@@ -81,7 +81,7 @@ const EventCarousel = () => {
                         <button
                             key={i}
                             onClick={() => setIndex(i)}
-                            className={`w-2.5 h-2.5 rounded-full transition-colors ${index === i ? "bg-primary" : "bg-primary/30"
+                            className={`w-2 h-2 rounded-full transition-colors ${index === i ? "bg-primary" : "bg-primary/30"
                                 }`}
                         />
                     ))}

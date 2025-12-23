@@ -21,7 +21,7 @@ const EventTile = () => {
             {/* 💻 DESKTOP GRID */}
             <div className="hidden md:flex flex-wrap gap-10 w-sm md:w-3xl xl:w-7xl items-center justify-center mb-10">
                 {eventDetails.map((event, index) => (
-                    <div key={index} onClick={() => navigate(`/event${event.id}`)}>
+                    <div key={index} onClick={() => navigate(`/events/${event.id}`)}>
                         <EventCard event={event} />
                     </div>
                 ))}

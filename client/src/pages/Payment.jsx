@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import CopyText from "../components/CopyText";
 
 const Payment = () => {
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ const Payment = () => {
 
             if (data.success) {
                 toast.success("Payment submitted. Status: Pending");
-                navigate("/success");
+                navigate("/success?page=payment");
             } else {
                 alert(data.message);
             }
@@ -77,7 +78,7 @@ const Payment = () => {
                 {/* UPI Instructions */}
                 <div className="mb-4 text-sm bg-blue-50 p-3 rounded">
                     <p className="font-semibold mb-1">Pay using UPI</p>
-                    <p>UPI ID: <b>ilavenil26@upi</b></p>
+                    <p className="flex items-center gap-1">UPI ID:<CopyText text={"ilavenil26@upi"} /></p>
                     <p>Amount: <b>₹200</b></p>
                     <p className="text-xs text-gray-600 mt-1">
                         After payment, enter UTR below

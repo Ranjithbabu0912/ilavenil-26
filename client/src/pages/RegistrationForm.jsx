@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from "react-toastify";
+import { useUser } from "@clerk/clerk-react";
 
 
 const eventsList = [
@@ -19,6 +20,10 @@ const eventsList = [
 const RegistrationForm = () => {
 
     const [loading, setLoading] = useState(false);
+
+    const { user, isLoaded, isSignedIn } = useUser();
+
+    const loggedInEmail = user?.primaryEmailAddress?.emailAddress;
 
     const navigate = useNavigate();
 
@@ -41,7 +46,6 @@ const RegistrationForm = () => {
     const [formData, setFormData] = useState({
         name: "",
         contact: "",
-        email: "",
         collegeName: "",
         discipline: "",
         year: "",
@@ -57,6 +61,13 @@ const RegistrationForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!isLoaded) return;
+
+        if (!loggedInEmail) {
+            toast.error("Login required");
+            return;
+        }
+
         if (selectedEvents.length < 1) {
             toast.error("Select at least one event");
             return;
@@ -64,6 +75,7 @@ const RegistrationForm = () => {
 
         const payload = {
             ...formData,
+            email: loggedInEmail, // ✅ FROM LOGIN
             contact: Number(formData.contact),
             events: {
                 primary: selectedEvents[0],
@@ -83,8 +95,11 @@ const RegistrationForm = () => {
             const data = await res.json();
 
             if (data.success) {
-                localStorage.setItem("registeredEmail", formData.email);
-                navigate(`/payment/${data.registrationId}`);
+                const registrationId = data.registrationId;
+
+                localStorage.setItem("registeredEmail", loggedInEmail);
+                navigate(`/success?page=register&rid=${registrationId}`);
+                // navigate('/success')
             } else {
                 toast.error(data.message);
             }
@@ -96,11 +111,56 @@ const RegistrationForm = () => {
     };
 
 
+    const userEmail = user?.primaryEmailAddress?.emailAddress || null;
+
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        // 🔐 Not logged in → Sign in
+        if (!isSignedIn) {
+            navigate("/sign-in");
+            return;
+        }
+
+        // 🔁 Check if already registered
+        const checkRegistration = async () => {
+            try {
+                const res = await fetch(
+                    "http://localhost:5000/api/events/check-status",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: userEmail }),
+                    }
+                );
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Already registered
+                    toast.info("You are already registered");
+
+                    // Redirect based on payment status
+                    if (data.status === "NOT_PAID" || data.status === "REJECTED") {
+                        navigate(`/payment/${data.registrationId}`);
+                    } else {
+                        navigate("/");
+                    }
+                }
+            } catch {
+                toast.error("Unable to verify registration");
+            }
+        };
+
+        checkRegistration();
+    }, [isLoaded, isSignedIn, userEmail, navigate]);
+
+
+
+
 
     return (
         <div className='my-30'>
-            <Navbar />
-
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-3 p-10 shadow-2xl rounded-2xl border-2 border-gray-200 max-w-lg mx-auto mt-10">
@@ -131,8 +191,9 @@ const RegistrationForm = () => {
                 <input
                     type="email"
                     name="email"
-                    className="border p-2 rounded"
-                    required
+                    value={loggedInEmail || ""}
+                    className="border p-2 rounded bg-gray-100 text-gray-500 cursor-not-allowed"
+                    disabled
                     onChange={handleChange}
                 />
 
@@ -229,7 +290,7 @@ const RegistrationForm = () => {
                             : "bg-blue-600 hover:bg-blue-800"
                             } text-white py-2 rounded`}
                     >
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? "Loading..." : "Register"}
                     </button>
                 </div>
 

@@ -60,6 +60,7 @@ export const checkPaymentStatus = async (req, res) => {
       success: true,
       status: registration.payment.status,
       events: registration.events,
+      registrationId: registration._id,
     });
   } catch (error) {
     res.status(500).json({
@@ -68,3 +69,4 @@ export const checkPaymentStatus = async (req, res) => {
     });
   }
 };
+

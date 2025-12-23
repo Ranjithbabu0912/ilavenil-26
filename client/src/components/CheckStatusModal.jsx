@@ -1,15 +1,28 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useUser } from "@clerk/clerk-react";
 
 const CheckStatusModal = ({ onClose }) => {
     const [email, setEmail] = useState("");
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const { user, isLoaded } = useUser();
+
+    // ✅ Auto-fill email from logged-in user
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        const userEmail = user?.primaryEmailAddress?.emailAddress;
+        if (userEmail) {
+            setEmail(userEmail);
+        }
+    }, [isLoaded, user]);
+
     const handleCheck = async () => {
         if (!email) {
-            toast.error("Enter registered email");
+            toast.error("Email not available");
             return;
         }
 
@@ -17,7 +30,7 @@ const CheckStatusModal = ({ onClose }) => {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/api/events/check-status", // ✅ FIXED
+                "http://localhost:5000/api/events/check-status",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -28,7 +41,7 @@ const CheckStatusModal = ({ onClose }) => {
             const data = await res.json();
 
             if (data.success) {
-                setStatus(data.status?.trim().toUpperCase()); // ✅ FIXED
+                setStatus(data.status?.trim().toUpperCase());
             } else {
                 toast.error(data.message);
             }
@@ -41,7 +54,7 @@ const CheckStatusModal = ({ onClose }) => {
 
     const statusColor = {
         NOT_PAID: ["text-yellow-600", "You didn't pay"],
-        PENDING: ["text-yellow-600", "Wait for a conformation"],
+        PENDING: ["text-yellow-600", "Wait for confirmation"],
         REJECTED: ["text-red-600", "Contact support"],
         APPROVED: ["text-green-600", "Check your email"],
     };
@@ -52,22 +65,21 @@ const CheckStatusModal = ({ onClose }) => {
 
                 <button
                     onClick={onClose}
-                    className="text-sm text-gray-500 mb-4 block hover:underline cursor-pointer"
+                    className="absolute top-3 right-3 text-gray-500 hover:text-black"
                 >
                     <X />
                 </button>
-
 
                 <h2 className="text-xl font-bold mb-4 text-center">
                     Check Payment Status
                 </h2>
 
+                {/* Email shown but NOT editable */}
                 <input
                     type="email"
-                    placeholder="Enter registered email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="border p-2 w-full mb-3 rounded"
+                    disabled
+                    className="border p-2 w-full mb-3 rounded bg-gray-100 cursor-not-allowed"
                 />
 
                 <button

@@ -3,6 +3,7 @@
 export const eventDetails = [
     {
         id: 1,
+        category: "Management",
         name: "CropIQ",
         desc: "Tests participant's knowledge of corporate trends, management concepts, and real-world business scenarios.",
         noOfPart: 2,
@@ -35,6 +36,7 @@ export const eventDetails = [
     },
     {
         id: 2,
+        category: "Management",
         name: "Market Mania",
         desc: "Tests participant's selling and convincing skills by pitching a product with creativity, strategy, and confidence.",
         noOfPart: 2,
@@ -67,6 +69,7 @@ export const eventDetails = [
     },
     {
         id: 3,
+        category: "Technical",
         name: "Zero Bug",
         desc: "A hands-on debugging contest that challenges participants to identify and fix errors with speed, accuracy, and logic.",
         noOfPart: 1,
@@ -98,6 +101,7 @@ export const eventDetails = [
     },
     {
         id: 4,
+        category: "Technical",
         name: "Webify",
         desc: "A creative web design event where participants build visually appealing and user-friendly websites within a limited time.",
         noOfPart: 2,
@@ -130,6 +134,7 @@ export const eventDetails = [
     },
     {
         id: 5,
+        category: "General",
         name: "IPL Aution",
         desc: "A simulation-based auction event where teams act as franchise owners, bidding strategically to build the best cricket team within a fixed budget.",
         noOfPart: 2,
@@ -163,6 +168,7 @@ export const eventDetails = [
     },
     {
         id: 6,
+        category: "General",
         name: "Mind Maze",
         desc: "A brain-teasing event filled with logic puzzles, reasoning challenges, and problem-solving rounds that test mental agility.",
         noOfPart: 1,
@@ -191,6 +197,7 @@ export const eventDetails = [
     },
     {
         id: 7,
+        category: "General",
         name: "Up2Date",
         desc: "A current affairs quiz that evaluates awareness of recent events, technology trends, and global happenings.",
         noOfPart: 1,
@@ -220,6 +227,7 @@ export const eventDetails = [
     },
     {
         id: 8,
+        category: "General",
         name: "Skillspark",
         desc: "A talent showcase platform that allows participants to express their creativity, innovation, and unique skills with confidence.",
         noOfPart: 5,
