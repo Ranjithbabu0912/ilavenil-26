@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+/* Google font as default */
+* {
+    font-family: "Outfit", "ahsing", sans-serif;
+    scrollbar-width: none;
+}
+
+body {
+    background: url('/gradientBackground.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.logo-text {
+    font-family: "ahsing", sans-serif;
+}
+
+@theme {
+    --color-primary: #5044E5;
+}
+
+/* Custom manual font */
+@font-face {
+    font-family: "ahsing";
+    src: url("./assets/fonts/ahsing.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
