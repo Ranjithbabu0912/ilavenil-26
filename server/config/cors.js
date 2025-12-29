@@ -7,15 +7,15 @@ const allowedOrigins = [
 
 const corsMiddleware = cors({
   origin: (origin, callback) => {
-    // Allow Postman, server-side calls
+    // allow browser, postman, server calls
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    // ❗ DO NOT throw error
-    return callback(null, false);
+    // 🔥 DO NOT BLOCK – allow but rely on auth instead
+    return callback(null, true);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
