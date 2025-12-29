@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from "react-toastify";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
 
 const eventsList = [
@@ -26,6 +26,8 @@ const RegistrationForm = () => {
     const loggedInEmail = user?.primaryEmailAddress?.emailAddress;
 
     const navigate = useNavigate();
+
+    const { getToken } = useAuth();
 
     const [selectedEvents, setSelectedEvents] = useState([])
 
@@ -123,10 +125,11 @@ const RegistrationForm = () => {
             navigate("/sign-in");
             return;
         }
-        const API_URL = import.meta.env.VITE_API_URL;
+        c
 
         // 🔁 Check if already registered
         const checkRegistration = async () => {
+            const token = await getToken();
             try {
                 const res = await fetch(
                     `${API_URL}/api/events/check-status`,
@@ -135,6 +138,7 @@ const RegistrationForm = () => {
                         credentials: "include",
                         headers: {
                             "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
                         },
                         body: JSON.stringify({
                             email: userEmail,

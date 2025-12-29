@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight, ShieldCheck, Menu, X } from "lucide-react";
-import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
+import { useAuth, useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 
 const Navbar = ({ onOpenStatus }) => {
@@ -9,6 +9,7 @@ const Navbar = ({ onOpenStatus }) => {
     const location = useLocation();
     const { openSignIn } = useClerk();
     const { user, isLoaded, isSignedIn } = useUser();
+    const { getToken } = useAuth();
 
     const [registered, setRegistered] = useState(false);
     const [paymentStatus, setPaymentStatus] = useState(null);
@@ -30,6 +31,7 @@ const Navbar = ({ onOpenStatus }) => {
         const fetchStatus = async () => {
 
             const API_URL = import.meta.env.VITE_API_URL;
+            const token = await getToken();
 
             try {
                 const res = await fetch(
@@ -39,6 +41,7 @@ const Navbar = ({ onOpenStatus }) => {
                         credentials: "include",
                         headers: {
                             "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,   
                         },
                         body: JSON.stringify({
                             email: userEmail,
