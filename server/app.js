@@ -14,7 +14,7 @@ import path from "path";
 const app = express();
 
 
-app.options("*", corsMiddleware);
+app.use(corsMiddleware);
 
 // app.use(corsMiddleware);
 app.use(express.json());
