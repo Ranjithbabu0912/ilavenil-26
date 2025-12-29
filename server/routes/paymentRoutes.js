@@ -9,10 +9,10 @@ const router = express.Router();
 
 router.post(
     "/manual/:id",
-    clerkProtect,
-    attachUser,
-    blockAdmin,  
     upload.single("screenshot"),
+    // clerkProtect,
+    // attachUser,
+    // blockAdmin,  
     submitPayment
 );
 
