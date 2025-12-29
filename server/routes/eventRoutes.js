@@ -7,7 +7,8 @@ import {
 const router = express.Router();
 
 router.post("/register", createRegistration);
-router.post(
+
+router.get(
   "/check-status",
   checkPaymentStatus
 );
