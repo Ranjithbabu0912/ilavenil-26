@@ -68,7 +68,7 @@ const Navbar = ({ onOpenStatus }) => {
         };
 
         fetchStatus();
-    }, [isLoaded, isSignedIn, userEmail]);
+    }, [isLoaded, isSignedIn, userEmail, isAdmin]);
 
     /* 🚦 AUTO FLOW CONTROL (NO UI CHANGE) */
     useEffect(() => {
