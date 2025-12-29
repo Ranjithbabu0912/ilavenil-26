@@ -11,7 +11,7 @@ import { adminOnly } from "../middlewares/adminOnly.js";
 
 const router = express.Router();
 
-router.get("/payments", getPayments);
+router.get("/payments", adminOnly, getPayments);
 
 router.get(
     "/payments/pending",
