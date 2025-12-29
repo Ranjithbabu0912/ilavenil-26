@@ -1,5 +1,5 @@
 import connectDB from "../../server/config/db.js";
-import Registration from "../../server/models/Registration.js";
+import eventRegistration from "../../server/models/eventRegistration.js";
 
 export default async function handler(req, res) {
     try {
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         const body =
             typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-        const registration = await Registration.findOne({
+        const registration = await eventRegistration.findOne({
             email: body.email,
         }).lean();
 
