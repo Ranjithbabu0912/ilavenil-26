@@ -1,7 +1,9 @@
+import connectDB from "../config/db.js";
 import EventRegistration from "../models/eventRegistration.js";
 
 export const createRegistration = async (req, res) => {
   try {
+
     const { email } = req.body;
 
     if (!email) {
@@ -19,35 +21,24 @@ export const createRegistration = async (req, res) => {
 
     const registration = await EventRegistration.create({
       ...req.body,
-      payment: {
-        status: "NOT_PAID",
-      },
+      payment: { status: "NOT_PAID" },
     });
 
     res.status(201).json({
       success: true,
-      message: "Registration created",
+
       registrationId: registration._id,
     });
-
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: "This email is already registered",
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
+
 export const checkPaymentStatus = async (req, res) => {
   try {
-    const { email } = req.query;
+
+    const { email } = req.body;
 
     if (!email) {
       return res.status(400).json({ success: false });

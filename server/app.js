@@ -6,7 +6,6 @@ import adminPaymentRoutes from "./routes/adminPaymentRoutes.js";
 import qrAttendanceRoutes from './routes/qrAttendanceRoutes.js';
 import userRoutes from "./routes/userRoutes.js";
 import adminAttendanceRoutes from "./routes/adminAttendanceRoutes.js";
-import cors from "cors";
 import { fileURLToPath } from "url";
 import path from "path";
 
@@ -14,28 +13,10 @@ import path from "path";
 
 const app = express();
 
-const allowedOrigins = [
-    "https://ilavenil-26.vercel.app",
-    "http://localhost:5173"
-];
-
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("CORS blocked"));
-            }
-        },
-        credentials: true,
-    })
-);
-
-
 
 app.use(corsMiddleware);
+
+// app.use(corsMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/register", createRegistration);
 
-router.get(
+router.post(
   "/check-status",
   checkPaymentStatus
 );
