@@ -1,8 +1,11 @@
+import connectDB from "../config/db.js";
 import EventRegistration from "../models/eventRegistration.js";
 import { isValidUTR } from "../utils/validateUTR.js";
 
 export const submitPayment = async (req, res) => {
   try {
+    await connectDB(); // 🔥 REQUIRED (THIS FIXES EVERYTHING)
+
     const { id } = req.params;
     const { utr } = req.body;
 
@@ -13,7 +16,6 @@ export const submitPayment = async (req, res) => {
       });
     }
 
-    // 🔍 Format validation
     if (!isValidUTR(utr)) {
       return res.status(400).json({
         success: false,
@@ -23,7 +25,6 @@ export const submitPayment = async (req, res) => {
 
     const normalizedUtr = utr.trim();
 
-    // 🔁 Duplicate UTR check
     const duplicate = await EventRegistration.findOne({
       "payment.utr": normalizedUtr,
     });
@@ -35,7 +36,6 @@ export const submitPayment = async (req, res) => {
       });
     }
 
-    // ✅ Cloudinary file handling
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -43,10 +43,9 @@ export const submitPayment = async (req, res) => {
       });
     }
 
-    const screenshotUrl = req.file.path;       // Cloudinary URL
-    const screenshotPublicId = req.file.filename; // public_id
+    const screenshotUrl = req.file.path;
+    const screenshotPublicId = req.file.filename;
 
-    // ✅ Update payment details
     const registration = await EventRegistration.findByIdAndUpdate(
       id,
       {
@@ -72,10 +71,10 @@ export const submitPayment = async (req, res) => {
       success: true,
       message: "Payment submitted successfully. Status: Pending",
     });
+
   } catch (error) {
     console.error("Payment error:", error);
 
-    // 🔐 DB-level duplicate safety
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
