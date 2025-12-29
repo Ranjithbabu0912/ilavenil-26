@@ -30,14 +30,16 @@ const Navbar = ({ onOpenStatus }) => {
         const fetchStatus = async () => {
             try {
                 const res = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/events/check-status`,
+                    `${import.meta.env.VITE_API_URL}/api/events/check-status?email=${encodeURIComponent(userEmail)}`,
                     {
                         method: "GET",
                         credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: userEmail }),
                     }
                 );
+
+                if (!res.ok) {
+                    throw new Error("Request failed");
+                }
 
                 const data = await res.json();
 
@@ -50,6 +52,7 @@ const Navbar = ({ onOpenStatus }) => {
                 console.error("Status fetch failed", err);
             }
         };
+
 
         fetchStatus();
     }, [isLoaded, isSignedIn, userEmail]);

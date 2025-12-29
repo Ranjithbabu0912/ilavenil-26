@@ -2,7 +2,7 @@ import EventRegistration from "../models/eventRegistration.js";
 
 export const createRegistration = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = req.query;
 
     // Check for duplicate email
     const existingRegistration = await EventRegistration.findOne({ email });
@@ -27,7 +27,7 @@ export const createRegistration = async (req, res) => {
       message: "Registration created",
       registrationId: registration._id,
     });
-    
+
   } catch (error) {
     // Handle MongoDB unique index error (safety net)
     if (error.code === 11000) {
@@ -45,7 +45,7 @@ export const createRegistration = async (req, res) => {
 };
 
 export const checkPaymentStatus = async (req, res) => {
-  const { email } = req.body;
+  const { email } = req.query;
   if (!email) {
     return res.status(400).json({ success: false });
   }

@@ -129,28 +129,30 @@ const RegistrationForm = () => {
         const checkRegistration = async () => {
             try {
                 const res = await fetch(
-                    `${API_URL}/api/events/check-status`,
+                    `${API_URL}/api/events/check-status?email=${encodeURIComponent(userEmail)}`,
                     {
                         method: "GET",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: userEmail }),
-                    })
-                    .then(res => res.json())
-                    .then(console.log);
+                        credentials: "include",
+                    }
+                );
+
+                if (!res.ok) {
+                    throw new Error("Request failed");
+                }
+
                 const data = await res.json();
 
                 if (data.success) {
-                    // Already registered
                     toast.info("You are already registered");
 
-                    // Redirect based on payment status
                     if (data.status === "NOT_PAID" || data.status === "REJECTED") {
                         navigate(`/payment/${data.registrationId}`);
                     } else {
                         navigate("/");
                     }
                 }
-            } catch {
+            } catch (err) {
+                console.error(err);
                 toast.error("Unable to verify registration");
             }
         };
