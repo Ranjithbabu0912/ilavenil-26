@@ -57,6 +57,7 @@ const RegistrationForm = () => {
             [e.target.name]: e.target.value,
         });
     };
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -86,7 +87,7 @@ const RegistrationForm = () => {
         try {
             setLoading(true);
 
-            const res = await fetch("http://localhost:5000/api/events/register", {
+            const res = await fetch(`${API_URL}/api/events/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
