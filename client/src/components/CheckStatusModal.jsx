@@ -12,6 +12,7 @@ const CheckStatusModal = ({ onClose }) => {
     const { user, isLoaded } = useUser();
 
     const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL;
 
     // Auto-fill email from logged-in user
     useEffect(() => {
@@ -33,7 +34,7 @@ const CheckStatusModal = ({ onClose }) => {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/api/events/check-status",
+                `${API_URL}/api/events/check-status`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
