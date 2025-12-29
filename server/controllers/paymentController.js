@@ -21,7 +21,6 @@ export const submitPayment = async (req, res) => {
       });
     }
 
-    // Normalize
     const normalizedUtr = utr.trim();
 
     // 🔁 Duplicate UTR check
@@ -36,7 +35,16 @@ export const submitPayment = async (req, res) => {
       });
     }
 
-    const screenshot = req.file ? req.file.filename : null;
+    // ✅ Cloudinary file handling
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment screenshot is required",
+      });
+    }
+
+    const screenshotUrl = req.file.path;       // Cloudinary URL
+    const screenshotPublicId = req.file.filename; // public_id
 
     // ✅ Update payment details
     const registration = await EventRegistration.findByIdAndUpdate(
@@ -45,7 +53,8 @@ export const submitPayment = async (req, res) => {
         $set: {
           "payment.method": "UPI",
           "payment.utr": normalizedUtr,
-          "payment.screenshot": screenshot,
+          "payment.screenshotUrl": screenshotUrl,
+          "payment.screenshotPublicId": screenshotPublicId,
           "payment.status": "PENDING",
         },
       },

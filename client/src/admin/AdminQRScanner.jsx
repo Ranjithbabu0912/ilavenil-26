@@ -1,6 +1,7 @@
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
+import { toast } from "react-toastify";
 
 const AdminQRScanner = () => {
     const { getToken } = useAuth();
@@ -111,7 +112,10 @@ const AdminQRScanner = () => {
                 return;
             }
 
+            const isPresent = status === "PRESENT";
+
             setMessage(`Marked ${status}`);
+            isPresent ? toast.success(`Marked ${status}`) : toast.error(`Marked ${status}`);
             setParticipant(null);
             setAlreadyMarked(false);
         } catch (err) {

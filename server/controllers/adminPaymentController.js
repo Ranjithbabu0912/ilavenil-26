@@ -1,5 +1,6 @@
 import EventRegistration from "../models/eventRegistration.js";
 import crypto from "crypto";
+import cloudinary from "../config/cloudinary.js";
 
 // 🔹 Get all pending payments
 export const getPendingPayments = async (req, res) => {
@@ -146,11 +147,14 @@ export const approvePayment = async (req, res) => {
 
 
 
-
 export const rejectPayment = async (req, res) => {
   await EventRegistration.findByIdAndUpdate(req.params.id, {
     "payment.status": "REJECTED",
   });
+
+  await cloudinary.uploader.destroy(
+    registration.payment.screenshotPublicId
+  );
   res.json({ success: true });
 };
 

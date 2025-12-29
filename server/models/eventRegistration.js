@@ -26,7 +26,11 @@ const eventRegistrationSchema = new mongoose.Schema(
                 type: String,
                 trim: true,
             },
-            screenshot: {
+            screenshotUrl: {
+                type: String,
+                default: null,
+            },
+            screenshotPublicId: {
                 type: String,
                 default: null,
             },

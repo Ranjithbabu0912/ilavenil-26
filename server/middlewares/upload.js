@@ -1,10 +1,13 @@
 import multer from "multer";
-import path from "path";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
 
-const storage = multer.diskStorage({
-  destination: "uploads/payments",
-  filename: (_, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "payments",
+    allowed_formats: ["jpg", "jpeg", "png"],
+    transformation: [{ width: 1200, height: 1200, crop: "limit" }],
   },
 });
 
@@ -16,6 +19,9 @@ const upload = multer({
     } else {
       cb(new Error("Only PNG/JPG allowed"));
     }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
   },
 });
 

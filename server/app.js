@@ -14,14 +14,26 @@ import path from "path";
 
 const app = express();
 
-
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://ilavenil-26.vercel.app"
+];
 
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true); // Postman, server-to-server
+
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            callback(new Error("Not allowed by CORS"));
+        },
         credentials: true,
     })
 );
+
 
 
 
