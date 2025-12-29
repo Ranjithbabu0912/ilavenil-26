@@ -27,7 +27,9 @@ const __dirname = path.dirname(__filename);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", qrAttendanceRoutes);
+
 app.use("/api/events", eventRoutes);
+
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminPaymentRoutes);
 app.use("/api", userRoutes);

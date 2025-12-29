@@ -37,26 +37,45 @@ export const createRegistration = async (req, res) => {
 
 export const checkPaymentStatus = async (req, res) => {
   try {
+    const { email } = req.body || {};
 
-    const { email } = req.body;
+    console.log("Checking registration for:", email);
 
+
+    // 1️⃣ Validate input
     if (!email) {
-      return res.status(400).json({ success: false });
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
     }
 
+    // 2️⃣ Find registration
     const registration = await EventRegistration.findOne({ email });
 
     if (!registration) {
-      return res.json({ success: false });
+      return res.status(404).json({
+        success: false,
+        message: "Registration not found",
+      });
     }
 
-    res.json({
+    // 3️⃣ Safe access
+    const paymentStatus = registration.payment?.status || "pending";
+
+    // 4️⃣ Success response
+    return res.status(200).json({
       success: true,
-      status: registration.payment.status,
+      status: paymentStatus,
       registrationId: registration._id,
     });
   } catch (err) {
     console.error("checkPaymentStatus ERROR:", err);
-    res.status(500).json({ success: false });
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
+

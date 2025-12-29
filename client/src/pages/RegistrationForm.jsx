@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from "react-toastify";
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 
 
 const eventsList = [
@@ -26,8 +25,6 @@ const RegistrationForm = () => {
     const loggedInEmail = user?.primaryEmailAddress?.emailAddress;
 
     const navigate = useNavigate();
-
-    const { getToken } = useAuth();
 
     const [selectedEvents, setSelectedEvents] = useState([])
 
@@ -125,33 +122,23 @@ const RegistrationForm = () => {
             navigate("/sign-in");
             return;
         }
-        c
 
-        // 🔁 Check if already registered
         const checkRegistration = async () => {
-            const token = await getToken();
             try {
-                const res = await fetch(
-                    `${API_URL}/api/events/check-status`,
-                    {
-                        method: "POST",
-                        credentials: "include",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({
-                            email: userEmail,
-                        }),
-                    }
-                );
+                const res = await fetch(`${API_URL}/api/events/check-status`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email: userEmail }),
+                });
 
-                if (!res.ok) {
-                    throw new Error("Request failed");
-                }
+                // If backend itself is down → real error
+                if (!res.ok) return;
 
                 const data = await res.json();
 
+                // ✅ ONLY act if already registered
                 if (data.success) {
                     toast.info("You are already registered");
 
@@ -161,11 +148,14 @@ const RegistrationForm = () => {
                         navigate("/");
                     }
                 }
+
+                // ❗ If not registered → DO NOTHING (silent flow)
             } catch (err) {
-                console.error(err);
-                toast.error("Unable to verify registration");
+                // ❗ Completely silent
+                console.warn("Registration check skipped");
             }
         };
+
 
         checkRegistration();
     }, [isLoaded, isSignedIn, userEmail, navigate]);
