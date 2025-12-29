@@ -2,9 +2,12 @@ import EventRegistration from "../models/eventRegistration.js";
 
 export const createRegistration = async (req, res) => {
   try {
-    const { email } = req.query;
+    const { email } = req.body;
 
-    // Check for duplicate email
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email required" });
+    }
+
     const existingRegistration = await EventRegistration.findOne({ email });
 
     if (existingRegistration) {
@@ -14,7 +17,6 @@ export const createRegistration = async (req, res) => {
       });
     }
 
-    // Create new registration
     const registration = await EventRegistration.create({
       ...req.body,
       payment: {
@@ -29,7 +31,6 @@ export const createRegistration = async (req, res) => {
     });
 
   } catch (error) {
-    // Handle MongoDB unique index error (safety net)
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
@@ -45,23 +46,26 @@ export const createRegistration = async (req, res) => {
 };
 
 export const checkPaymentStatus = async (req, res) => {
-  const { email } = req.query;
-  if (!email) {
-    return res.status(400).json({ success: false });
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ success: false });
+    }
+
+    const registration = await EventRegistration.findOne({ email });
+
+    if (!registration) {
+      return res.json({ success: false });
+    }
+
+    res.json({
+      success: true,
+      status: registration.payment.status,
+      registrationId: registration._id,
+    });
+  } catch (err) {
+    console.error("checkPaymentStatus ERROR:", err);
+    res.status(500).json({ success: false });
   }
-
-  const registration = await EventRegistration.findOne({ email });
-
-  if (!registration) {
-    return res.json({ success: false });
-  }
-
-  res.json({
-    success: true,
-    status: registration.payment.status,
-    registrationId: registration._id,
-    events: registration.events,
-  });
 };
-
-
