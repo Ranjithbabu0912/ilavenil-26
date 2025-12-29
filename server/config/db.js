@@ -1,19 +1,27 @@
 import mongoose from "mongoose";
 
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      tls: true,
-      tlsAllowInvalidCertificates: true,
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGODB_URI, {
+      dbName: "ilavenil",
       bufferCommands: false,
       serverSelectionTimeoutMS: 20000,
     });
-
-    console.log("✅ MongoDB Connected");
-  } catch (error) {
-    console.error("❌ MongoDB Connection Failed:", error.message);
-    process.exit(1);
   }
+
+  cached.conn = await cached.promise;
+  console.log("✅ MongoDB Connected");
+  return cached.conn;
 };
 
 export default connectDB;
