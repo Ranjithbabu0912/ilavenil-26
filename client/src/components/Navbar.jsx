@@ -15,6 +15,9 @@ const Navbar = ({ onOpenStatus }) => {
     const [registrationId, setRegistrationId] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    // 🛡 Prevent repeated redirects / modal opens
+    const [handled, setHandled] = useState(false);
+
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
     const isAdmin = user?.publicMetadata?.role === "admin";
 
@@ -28,7 +31,6 @@ const Navbar = ({ onOpenStatus }) => {
         if (!isLoaded || !isSignedIn || !userEmail) return;
 
         const fetchStatus = async () => {
-
             const API_URL = import.meta.env.VITE_API_URL;
 
             try {
@@ -43,9 +45,7 @@ const Navbar = ({ onOpenStatus }) => {
                     }
                 );
 
-                if (!res.ok) {
-                    throw new Error("Request failed");
-                }
+                if (!res.ok) throw new Error("Request failed");
 
                 const data = await res.json();
 
@@ -53,21 +53,64 @@ const Navbar = ({ onOpenStatus }) => {
                     setRegistered(false);
                     setPaymentStatus(null);
                     setRegistrationId(null);
+                    setHandled(false);
                     return;
                 }
 
                 setRegistered(true);
                 setPaymentStatus(data.status);
                 setRegistrationId(data.registrationId);
+                setHandled(false);
 
             } catch (err) {
                 console.error("Status fetch failed", err);
             }
         };
 
-
         fetchStatus();
     }, [isLoaded, isSignedIn, userEmail]);
+
+    /* 🚦 AUTO FLOW CONTROL (NO UI CHANGE) */
+    useEffect(() => {
+        if (
+            !isLoaded ||
+            !isSignedIn ||
+            !registered ||
+            !paymentStatus ||
+            isAdmin ||
+            handled
+        ) return;
+
+        // 🔴 Payment not done → redirect
+        if (
+            paymentStatus === "NOT_PAID" ||
+            paymentStatus === "REJECTED"
+        ) {
+            setHandled(true);
+            navigate(`/payment/${registrationId}`);
+            return;
+        }
+
+        // 🟡 Payment pending / approved → open status modal
+        if (
+            paymentStatus === "PENDING" ||
+            paymentStatus === "APPROVED"
+        ) {
+            setHandled(true);
+            onOpenStatus();
+        }
+
+    }, [
+        isLoaded,
+        isSignedIn,
+        registered,
+        paymentStatus,
+        registrationId,
+        isAdmin,
+        handled,
+        navigate,
+        onOpenStatus
+    ]);
 
     /* ================= HANDLERS ================= */
 
@@ -106,7 +149,6 @@ const Navbar = ({ onOpenStatus }) => {
 
                 {/* DESKTOP NAV */}
                 <nav className="hidden md:flex gap-10 items-center">
-
                     <span onClick={() => goTo("/")} className="cursor-pointer">Home</span>
                     <span onClick={() => goTo("/about")} className="cursor-pointer">About</span>
                     <span onClick={() => goTo("/events")} className="cursor-pointer">Events</span>
