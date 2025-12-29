@@ -4,22 +4,19 @@ import { isValidUTR } from "../utils/validateUTR.js";
 
 export const submitPayment = async (req, res) => {
   try {
-    await connectDB(); // 🔥 REQUIRED (THIS FIXES EVERYTHING)
+    await connectDB();
 
     const { id } = req.params;
     const { utr } = req.body;
 
     if (!utr) {
-      return res.status(400).json({
-        success: false,
-        message: "UTR is required",
-      });
+      return res.status(400).json({ success: false, message: "UTR is required" });
     }
 
     if (!isValidUTR(utr)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid UTR format. UTR must be a 10–22 digit number.",
+        message: "Invalid UTR format (10–22 digits)",
       });
     }
 
@@ -32,7 +29,7 @@ export const submitPayment = async (req, res) => {
     if (duplicate) {
       return res.status(409).json({
         success: false,
-        message: "This UTR is already used. Please enter a valid UTR.",
+        message: "This UTR is already used",
       });
     }
 
@@ -43,17 +40,14 @@ export const submitPayment = async (req, res) => {
       });
     }
 
-    const screenshotUrl = req.file.path;
-    const screenshotPublicId = req.file.filename;
-
     const registration = await EventRegistration.findByIdAndUpdate(
       id,
       {
         $set: {
           "payment.method": "UPI",
           "payment.utr": normalizedUtr,
-          "payment.screenshotUrl": screenshotUrl,
-          "payment.screenshotPublicId": screenshotPublicId,
+          "payment.screenshotUrl": req.file.path,
+          "payment.screenshotPublicId": req.file.filename,
           "payment.status": "PENDING",
         },
       },
@@ -74,14 +68,6 @@ export const submitPayment = async (req, res) => {
 
   } catch (error) {
     console.error("Payment error:", error);
-
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: "Duplicate UTR detected",
-      });
-    }
-
     return res.status(500).json({
       success: false,
       message: "Server error",
