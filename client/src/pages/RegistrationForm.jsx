@@ -131,7 +131,7 @@ const RegistrationForm = () => {
                 const res = await fetch(
                     `${API_URL}/api/events/check-status`,
                     {
-                        method: "POST",
+                        method: "GET",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email: userEmail }),
                     })
