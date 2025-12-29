@@ -1,53 +1,67 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import CopyText from "../components/CopyText";
+import { useAuth } from "@clerk/clerk-react";
+
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Payment = () => {
     const navigate = useNavigate();
-
     const { id } = useParams();
+    const { getToken } = useAuth();
 
     const [utr, setUtr] = useState("");
     const [screenshot, setScreenshot] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const utrRegex = /^[0-9]{10,22}$/;
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!utr) {
-            alert("UTR required");
+            toast.error("UTR is required");
+            return;
+        }
+
+        if (!utrRegex.test(utr.trim())) {
+            toast.error("UTR must be a 10–22 digit number");
             return;
         }
 
         setLoading(true);
 
+        const token = await getToken(); // 🔥 THIS IS THE FIX
+
         const formData = new FormData();
-        formData.append("utr", utr);
-        if (screenshot) {
-            formData.append("screenshot", screenshot);
-        }
+        formData.append("utr", utr.trim());
+        if (screenshot) formData.append("screenshot", screenshot);
 
         try {
             const res = await fetch(
-                `http://localhost:5000/api/payments/manual/${id}`,
+                `${API_URL}/api/payments/manual/${id}`,
                 {
                     method: "POST",
                     body: formData,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
 
             const data = await res.json();
 
-            if (data.success) {
-                toast.success("Payment submitted. Status: Pending");
-                navigate("/success?page=payment");
-            } else {
-                alert(data.message);
+            if (!res.ok) {
+                toast.error(data.message || "Payment failed");
+                return;
             }
-        } catch (error) {
-            alert("Server error");
+
+            toast.success("Payment submitted. Status: Pending");
+            navigate("/success?page=payment");
+        } catch {
+            toast.error("Server error");
         } finally {
             setLoading(false);
         }
@@ -78,8 +92,16 @@ const Payment = () => {
                 {/* UPI Instructions */}
                 <div className="mb-4 text-sm bg-blue-50 p-3 rounded">
                     <p className="font-semibold mb-1">Pay using UPI</p>
-                    <p className="flex items-center gap-1">UPI ID:<CopyText text={"ilavenil26@upi"} /></p>
-                    <p>Amount: <b>₹200</b></p>
+
+                    <p className="flex items-center gap-1">
+                        UPI ID:
+                        <CopyText text="ilavenil26@upi" />
+                    </p>
+
+                    <p>
+                        Amount: <b>₹200</b>
+                    </p>
+
                     <p className="text-xs text-gray-600 mt-1">
                         After payment, enter UTR below
                     </p>

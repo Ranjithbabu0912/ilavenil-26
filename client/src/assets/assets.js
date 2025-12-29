@@ -4,6 +4,7 @@ export const eventDetails = [
     {
         id: 1,
         category: "Management",
+        banner: "/corpiq.png",
         name: "CropIQ",
         desc: "Tests participant's knowledge of corporate trends, management concepts, and real-world business scenarios.",
         noOfPart: 2,
@@ -37,6 +38,7 @@ export const eventDetails = [
     {
         id: 2,
         category: "Management",
+        banner: "/marketMania.png",
         name: "Market Mania",
         desc: "Tests participant's selling and convincing skills by pitching a product with creativity, strategy, and confidence.",
         noOfPart: 2,
@@ -70,6 +72,7 @@ export const eventDetails = [
     {
         id: 3,
         category: "Technical",
+        banner: "/zeroBug.png",
         name: "Zero Bug",
         desc: "A hands-on debugging contest that challenges participants to identify and fix errors with speed, accuracy, and logic.",
         noOfPart: 1,
@@ -102,6 +105,7 @@ export const eventDetails = [
     {
         id: 4,
         category: "Technical",
+        banner: "/webify.png",
         name: "Webify",
         desc: "A creative web design event where participants build visually appealing and user-friendly websites within a limited time.",
         noOfPart: 2,
@@ -135,6 +139,7 @@ export const eventDetails = [
     {
         id: 5,
         category: "General",
+        banner: "/iplAuction.png",
         name: "IPL Aution",
         desc: "A simulation-based auction event where teams act as franchise owners, bidding strategically to build the best cricket team within a fixed budget.",
         noOfPart: 2,
@@ -169,6 +174,7 @@ export const eventDetails = [
     {
         id: 6,
         category: "General",
+        banner: "/mindMaze.png",
         name: "Mind Maze",
         desc: "A brain-teasing event filled with logic puzzles, reasoning challenges, and problem-solving rounds that test mental agility.",
         noOfPart: 1,
@@ -198,6 +204,7 @@ export const eventDetails = [
     {
         id: 7,
         category: "General",
+        banner: "/up2date.png",
         name: "Up2Date",
         desc: "A current affairs quiz that evaluates awareness of recent events, technology trends, and global happenings.",
         noOfPart: 1,
@@ -228,6 +235,7 @@ export const eventDetails = [
     {
         id: 8,
         category: "General",
+        banner: "/skillspark.png",
         name: "Skillspark",
         desc: "A talent showcase platform that allows participants to express their creativity, innovation, and unique skills with confidence.",
         noOfPart: 5,
@@ -260,14 +268,6 @@ export const eventDetails = [
                 name: "name2",
                 contact: "+91 90876 54321"
             },
-            {
-                name: "name3",
-                contact: "+91 90876 54321"
-            },
-            {
-                name: "name4",
-                contact: "+91 90876 54321"
-            }
         ]
     },
 ]
@@ -305,33 +305,33 @@ export const rulesAndGuidelines = [
 
 export const paymentRule = [
     {
-        icon: "🎯",
-        title: "Slect Event",
-        desc: "Choose from our diverse range of academic competitions"
+        icon: "📝",
+        title: "Start Registration",
+        desc: "Click the “Register Now” button to access the registration form."
     },
     {
-        icon: "👥",
-        title: "Fill the Form",
-        desc: "Register your details in the registration form"
+        icon: "👤",
+        title: "Complete the Form",
+        desc: "Enter all required details accurately and proceed to the payment step."
     },
     {
         icon: "💳",
-        title: "Make Payment",
-        desc: "Complete secure payment via UPI or other methods"
+        title: "Make the Payment",
+        desc: "Complete the payment securely via UPI by scanning the QR code or using the UPI ID."
     },
     {
-        icon: "📸",
-        title: "Upload Receipt",
-        desc: "Upload payment screenshot for verification"
+        icon: "🧾",
+        title: "Upload Payment Proof",
+        desc: "Upload a clear screenshot of the successful payment for verification."
     },
     {
-        icon: "✅",
-        title: "Get Verified",
-        desc: "Wait for verification of your payment"
+        icon: "🔍",
+        title: "Payment Verification",
+        desc: "Your payment will be reviewed and verified by the organizing team."
     },
     {
-        icon: "📱",
-        title: "Download QR",
-        desc: "Download QR codes for event attendance"
-    },
-]
+        icon: "📲",
+        title: "Access Event QR Code",
+        desc: "After verification, download your QR code for event attendance."
+    }
+];

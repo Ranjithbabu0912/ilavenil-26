@@ -2,12 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { eventDetails } from "../assets/assets";
 import EventCard from "./EventCard";
+import { useNavigate } from "react-router-dom";
 
 const AUTO_SCROLL_TIME = 4000; // 4 seconds
 
 const EventCarousel = () => {
+
+
+    const navigate = useNavigate();
     const [index, setIndex] = useState(0);
     const total = eventDetails.length;
+
 
     // 🔹 refs for touch & autoplay
     const startX = useRef(0);
@@ -68,7 +73,7 @@ const EventCarousel = () => {
                         style={{ transform: `translateX(-${index * 100}%)` }}
                     >
                         {eventDetails.map((event, i) => (
-                            <div key={i} className="w-full shrink-0 px-2">
+                            <div key={i} className="w-full shrink-0 px-2" onClick={() => navigate(`/events/${event.id}`)}>
                                 <EventCard event={event} />
                             </div>
                         ))}

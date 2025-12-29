@@ -11,10 +11,13 @@ import {
 
 import { eventDetails } from "../assets/assets";
 import Navbar from "./Navbar";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
 const EventDetails = () => {
-    const { id } = useParams();          // id from URL
+    const { id } = useParams();
     const navigate = useNavigate();
+    const { openSignIn } = useClerk();
+    const { user } = useUser();
 
     // 🔑 Find the selected event
     const event = eventDetails.find(
@@ -53,7 +56,7 @@ const EventDetails = () => {
                         <ArrowLeft size={18} /> Back
                     </button>
 
-                    <h1 className="text-4xl md:text-6xl font-bold">
+                    <h1 className="text-4xl md:text-6xl text-white font-bold">
                         {event.name}
                     </h1>
 
@@ -61,7 +64,7 @@ const EventDetails = () => {
                         {event.desc}
                     </p>
 
-                    <button className="mt-6 px-8 py-3 bg-indigo-600 rounded-full hover:bg-indigo-500 transition cursor-pointer">
+                    <button className="mt-6 px-8 py-3 bg-primary rounded-full hover:bg-blue-600 text-white hover:scale-105 active:scale-90 transition cursor-pointer" onClick={user ? () => navigate('/RegistrationForm') : openSignIn}>
                         Register Now
                     </button>
                 </div>
@@ -100,7 +103,7 @@ const EventDetails = () => {
                     </ul>
                 </section>
 
-                
+
                 {/* COORDINATORS */}
                 <section className="">
                     <h2 className="text-2xl font-semibold mb-6">
@@ -140,7 +143,7 @@ const EventDetails = () => {
 
 
 
-        </div>
+        </div >
 
 
     );

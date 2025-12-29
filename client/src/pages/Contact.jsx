@@ -3,9 +3,8 @@ import Navbar from '../components/Navbar'
 
 const Contact = () => {
     return (
-
-        <div>
-            <h1 className='mt-30'>Contact</h1>
+        <div className='flex flex-col items-center mt-28'>
+            <h1 className='text-3xl font-bold mb-12 text-primary'>Contact</h1>
         </div>
     )
 }

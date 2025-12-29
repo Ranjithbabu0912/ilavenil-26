@@ -4,7 +4,7 @@
 /* Google font as default */
 * {
     font-family: "Outfit", "ahsing", sans-serif;
-    scrollbar-width: none;
+    /* scrollbar-width: none; */
 }
 
 body {

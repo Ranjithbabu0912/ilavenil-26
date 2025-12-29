@@ -2,31 +2,21 @@ import multer from "multer";
 import path from "path";
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/");
-    },
-    filename: (req, file, cb) => {
-        cb(
-            null,
-            Date.now() + path.extname(file.originalname)
-        );
-    },
+  destination: "uploads/payments",
+  filename: (_, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
 });
 
-const fileFilter = (req, file, cb) => {
-    const allowed = /jpg|jpeg|png/;
-    const ext = allowed.test(
-        path.extname(file.originalname).toLowerCase()
-    );
-    const mime = allowed.test(file.mimetype);
-
-    if (ext && mime) cb(null, true);
-    else cb(new Error("Only JPG / PNG allowed"));
-};
-
 const upload = multer({
-    storage,
-    fileFilter,
+  storage,
+  fileFilter: (_, file, cb) => {
+    if (["image/png", "image/jpeg"].includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PNG/JPG allowed"));
+    }
+  },
 });
 
 export default upload;

@@ -27,6 +27,7 @@ export const createRegistration = async (req, res) => {
       message: "Registration created",
       registrationId: registration._id,
     });
+    
   } catch (error) {
     // Handle MongoDB unique index error (safety net)
     if (error.code === 11000) {
@@ -44,29 +45,23 @@ export const createRegistration = async (req, res) => {
 };
 
 export const checkPaymentStatus = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    const registration = await EventRegistration.findOne({ email });
-
-    if (!registration) {
-      return res.status(404).json({
-        success: false,
-        message: "No registration found with this email",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      status: registration.payment.status,
-      events: registration.events,
-      registrationId: registration._id,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ success: false });
   }
+
+  const registration = await EventRegistration.findOne({ email });
+
+  if (!registration) {
+    return res.json({ success: false });
+  }
+
+  res.json({
+    success: true,
+    status: registration.payment.status,
+    registrationId: registration._id,
+    events: registration.events,
+  });
 };
+
 

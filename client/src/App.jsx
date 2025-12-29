@@ -1,23 +1,30 @@
-import React, { useEffect, useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
-import Home from './pages/Home'
-import About from './pages/About'
-import Events from './pages/Events'
-import Contact from './pages/Contact'
-import RegistrationForm from './pages/RegistrationForm'
-import Success from './pages/Success'
-import Payment from './pages/Payment'
-import Agenda from './pages/Agenda'
-import Rules from './pages/Rules'
-import Event from './components/Event'
-import ProtectedRoute from './components/ProtectedRoute'
-import SignInPage from './pages/SignInPage'
-import Loader from './components/Loader/Loader'
-import EventDetails from './components/EventDetails'
-import Navbar from './components/Navbar'
+import React, { useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
+
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Events from "./pages/Events";
+import Contact from "./pages/Contact";
+import RegistrationForm from "./pages/RegistrationForm";
+import Success from "./pages/Success";
+import Payment from "./pages/Payment";
+import Agenda from "./pages/Agenda";
+import Rules from "./pages/Rules";
+import SignInPage from "./pages/SignInPage";
+import EventDetails from "./components/EventDetails";
+import Navbar from "./components/Navbar";
+import Loader from "./components/Loader/Loader";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./routes/AdminRoute";
+import AdminDashboard from "./admin/AdminDashboard";
+import AdminQRScanner from "./admin/AdminQRScanner";
+import UserRoute from "./components/UserRoute";
+import MyQR from "./components/MyQR";
+import AdminLayout from "./admin/AdminLayout";
+import ScrollToTop from "./components/ScrollTop";
 
 const App = () => {
-
   const [loading, setLoading] = useState(true);
   const [openStatus, setOpenStatus] = useState(false);
 
@@ -26,40 +33,79 @@ const App = () => {
     return () => clearTimeout(t);
   }, []);
 
-
   if (loading) return <Loader />;
 
   return (
-    <div className=''>
+    <div>
       <Navbar onOpenStatus={() => setOpenStatus(true)} />
-      <Routes>
-        <Route path='/' element={<Home openStatus={openStatus} setOpenStatus={setOpenStatus} />} />
-        <Route path="/sign-in/*" element={<SignInPage />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/events' element={<Events />} />
-        <Route path='/events/:id' element={<EventDetails />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/agenda' element={<Agenda />} />
-        <Route path='/rules_and_guidelines' element={<Rules />} />
 
-        <Route path='/RegistrationForm' element={
-          <ProtectedRoute>
-            <RegistrationForm />
-          </ProtectedRoute>
-        }
+      <ScrollToTop />
+      <Routes>
+        {/* PUBLIC */}
+        <Route path="/" element={<Home openStatus={openStatus} setOpenStatus={setOpenStatus} />} />
+        <Route path="/sign-in/*" element={<SignInPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/events/:id" element={<EventDetails />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/agenda" element={<Agenda />} />
+        <Route path="/rules_and_guidelines" element={<Rules />} />
+
+        {/* USER PROTECTED */}
+        <Route
+          path="/RegistrationForm"
+          element={
+            <ProtectedRoute>
+              <RegistrationForm />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path='/payment/:id' element={
-          <ProtectedRoute>
-            <Payment />
-          </ProtectedRoute>
-        } />
+        <Route
+          path="/my-qr"
+          element={
+            <UserRoute>
+              <MyQR />
+            </UserRoute>
+          }
+        />
 
+        <Route
+          path="/payment/:id"
+          element={
+            <ProtectedRoute>
+              <Payment />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/success" element={<Success />} />
+
+        {/* 🔥 ADMIN ONLY */}
+
+
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route
+            path="payments"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="attendance"
+            element={
+              <AdminRoute>
+                <AdminQRScanner />
+              </AdminRoute>
+            }
+          />
+        </Route>
       </Routes>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

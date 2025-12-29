@@ -22,12 +22,20 @@ const Hero = () => {
     }, [isLoaded, userEmail]);
 
 
+    const isAdmin = user?.publicMetadata?.role === "admin";
+
+
 
     const registrationButton = () => {
 
         // 🔐 Not logged in
         if (!isSignedIn) {
             openSignIn();
+            return;
+        }
+
+        if (isAdmin) {
+            navigate('/admin');
             return;
         }
 
@@ -74,7 +82,7 @@ const Hero = () => {
                         <div className='flex justify-center gap-4 mt-6'>
 
                             <button
-                                className='px-5 py-3 text-xs md:text-sm rounded-lg flex items-center gap-2 bg-primary text-white'
+                                className='px-5 py-3 text-xs md:text-sm rounded-lg flex items-center gap-2 bg-primary hover:bg-blue-800 text-white hover:scale-102 active:scale-95 hover:shadow-2xl transition'
                                 onClick={registrationButton}
                             >
                                 {registered ? "Already Registered" : "Register Now"}
@@ -109,7 +117,11 @@ const Hero = () => {
                         </button>
 
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={() => window.open(
+                                "https://chat.whatsapp.com/IlF8utFK4b47BTVbj5bLVB",
+                                "_blank",
+                                "noopener,noreferrer"
+                            )}
                             className='px-5 py-3 text-xs md:text-sm rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-green-400 text-green-500 hover:bg-green-500 hover:text-white hover:shadow-2xl'
                         >
                             Whatsapp <ChevronRight />

@@ -7,7 +7,7 @@ export default function Loader() {
     <div className="creative-loader-wrapper">
       <div className="word">
         {text.split("").map((char, i) => (
-          <span className="logo-text" key={i} style={{ "--i": i }}>
+          <span className="logo-text text-4xl md:text-6xl lg:text-8xl" key={i} style={{ "--i": i }}>
             {char}
           </span>
         ))}

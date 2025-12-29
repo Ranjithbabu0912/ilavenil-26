@@ -1,30 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowRight, ShieldCheck, Menu, X } from "lucide-react";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 
 const Navbar = ({ onOpenStatus }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { openSignIn } = useClerk();
     const { user, isLoaded, isSignedIn } = useUser();
 
     const [registered, setRegistered] = useState(false);
     const [paymentStatus, setPaymentStatus] = useState(null);
     const [registrationId, setRegistrationId] = useState(null);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
+    const isAdmin = user?.publicMetadata?.role === "admin";
 
-    // 🔍 Check registration + payment status
+    /* 🔁 AUTO CLOSE MENU ON ROUTE CHANGE */
     useEffect(() => {
-        if (!isLoaded || !userEmail) return;
+        setIsMenuOpen(false);
+    }, [location.pathname]);
+
+    /* 🔍 CHECK REGISTRATION + PAYMENT STATUS */
+    useEffect(() => {
+        if (!isLoaded || !isSignedIn || !userEmail) return;
 
         const fetchStatus = async () => {
             try {
                 const res = await fetch(
-                    "http://localhost:5000/api/events/check-status",
+                    `${import.meta.env.VITE_API_URL}/api/events/check-status`,
                     {
                         method: "POST",
+                        credentials: "include",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email: userEmail }),
                     }
@@ -36,101 +45,191 @@ const Navbar = ({ onOpenStatus }) => {
                     setRegistered(true);
                     setPaymentStatus(data.status);
                     setRegistrationId(data.registrationId);
-                } else {
-                    setRegistered(false);
                 }
-            } catch {
-                toast.error("Unable to fetch payment status");
+            } catch (err) {
+                console.error("Status fetch failed", err);
             }
         };
 
         fetchStatus();
-    }, [isLoaded, userEmail]);
+    }, [isLoaded, isSignedIn, userEmail]);
 
-    /* ================== BUTTON HANDLERS ================== */
+    /* ================= HANDLERS ================= */
 
-    const handleRegister = () => navigate("/RegistrationForm");
+    const goTo = (path) => {
+        setIsMenuOpen(false);
+        navigate(path);
+    };
+
+    const handleRegister = () => {
+        setIsMenuOpen(false);
+        navigate("/RegistrationForm");
+    };
 
     const handlePayment = () => {
         if (!registrationId) {
             toast.error("Registration not found");
             return;
         }
+        setIsMenuOpen(false);
         navigate(`/payment/${registrationId}`);
     };
 
-    /* ================== RENDER ================== */
+    /* ================= RENDER ================= */
 
     return (
-        <div className="fixed top-0 z-999 w-full backdrop-blur-3xl flex justify-between items-center py-8 px-4 sm:px-20 xl:px-32">
+        <header className="fixed top-0 z-100 w-full backdrop-blur-3xl shadow">
+            <div className="flex justify-between items-center py-8 px-4 sm:px-20 xl:px-32">
 
-            <h1
-                className="text-sm md:text-xl lg:text-2xl xl:text-3xl cursor-pointer logo-text text-gray-800"
-                onClick={() => navigate("/")}
-            >
-                ILAVENIL'26
-            </h1>
+                {/* LOGO */}
+                <h1
+                    className="text-lg md:text-2xl logo-text cursor-pointer"
+                    onClick={() => goTo("/")}
+                >
+                    ILAVENIL'26
+                </h1>
 
-            <nav className="hidden md:block">
-                <ul className="flex gap-10">
-                    <li onClick={() => navigate("/about")} className="cursor-pointer">About</li>
-                    <li onClick={() => navigate("/events")} className="cursor-pointer">Events</li>
-                    <li onClick={() => navigate("/contact")} className="cursor-pointer">Contact</li>
-                </ul>
-            </nav>
+                {/* DESKTOP NAV */}
+                <nav className="hidden md:flex gap-10 items-center">
 
-            <div className="flex gap-3">
+                    <span onClick={() => goTo("/")} className="cursor-pointer">Home</span>
+                    <span onClick={() => goTo("/about")} className="cursor-pointer">About</span>
+                    <span onClick={() => goTo("/events")} className="cursor-pointer">Events</span>
+                    <span onClick={() => goTo("/contact")} className="cursor-pointer">Contact</span>
 
-                {/* 🔐 Login */}
-                {!isSignedIn && (
-                    <button
-                        onClick={openSignIn}
-                        className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white flex items-center gap-2 cursor-pointer"
-                    >
-                        Sign In <ArrowRight className="h-4" />
-                    </button>
-                )}
-
-                {/* 📝 Not Registered */}
-                {isSignedIn && !registered && (
-                    <button
-                        onClick={handleRegister}
-                        className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white flex items-center gap-2 cursor-pointer"
-                    >
-                        Register Now <ArrowRight className="h-4" />
-                    </button>
-                )}
-
-                {/* 💳 Registered but NOT PAID */}
-                {isSignedIn &&
-                    registered &&
-                    (paymentStatus === "NOT_PAID" ||
-                        paymentStatus === "REJECTED") && (
-                        <button
-                            onClick={handlePayment}
-                            className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white flex items-center gap-2 cursor-pointer"
+                    {isAdmin && (
+                        <span
+                            onClick={() => goTo("/admin")}
+                            className="cursor-pointer text-red-600 font-semibold flex items-center gap-1"
                         >
-                            Proceed to Payment <ArrowRight className="h-4" />
+                            <ShieldCheck className="h-4 w-4" />
+                            Admin
+                        </span>
+                    )}
+                </nav>
+
+                {/* DESKTOP ACTIONS */}
+                <div className="hidden md:flex gap-3 items-center">
+
+                    {!isSignedIn && (
+                        <button
+                            onClick={openSignIn}
+                            className="px-4 py-2 rounded-lg bg-primary text-white flex items-center gap-2"
+                        >
+                            Sign In <ArrowRight className="h-4" />
                         </button>
                     )}
 
-                {/* ⏳ Payment submitted / approved */}
-                {isSignedIn &&
-                    registered &&
-                    (paymentStatus === "PENDING" ||
-                        paymentStatus === "APPROVED") && (
+                    {isSignedIn && !registered && !isAdmin && (
                         <button
-                            onClick={onOpenStatus}
-                            className="md:px-5 md:py-3 px-3 py-2 rounded-lg bg-primary text-white cursor-pointer"
+                            onClick={handleRegister}
+                            className="px-4 py-2 rounded-lg bg-primary text-white flex items-center gap-2"
                         >
-                            Check Status
+                            Register Now <ArrowRight className="h-4" />
                         </button>
                     )}
 
-                {isSignedIn && <UserButton />}
+                    {isSignedIn && registered && !isAdmin &&
+                        (paymentStatus === "NOT_PAID" || paymentStatus === "REJECTED") && (
+                            <button
+                                onClick={handlePayment}
+                                className="px-4 py-2 rounded-lg bg-primary text-white"
+                            >
+                                Proceed to Payment
+                            </button>
+                        )
+                    }
 
+                    {isSignedIn && registered && !isAdmin &&
+                        (paymentStatus === "PENDING" || paymentStatus === "APPROVED") && (
+                            <button
+                                onClick={onOpenStatus}
+                                className="px-4 py-2 rounded-lg bg-primary text-white"
+                            >
+                                Check Status
+                            </button>
+                        )
+                    }
+
+                    {isSignedIn && <UserButton />}
+                </div>
+
+                {/* MOBILE MENU BUTTON */}
+                <button
+                    className="md:hidden"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                    {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
             </div>
-        </div>
+
+            {/* MOBILE SLIDE MENU */}
+            <div
+                className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out
+                ${isMenuOpen ? "max-h-175 opacity-100" : "max-h-0 opacity-0"}`}
+            >
+                <div className="bg-white shadow-lg px-6 py-6 space-y-4">
+
+                    <p onClick={() => goTo("/")} className="cursor-pointer">Home</p>
+                    <p onClick={() => goTo("/about")} className="cursor-pointer">About</p>
+                    <p onClick={() => goTo("/events")} className="cursor-pointer">Events</p>
+                    <p onClick={() => goTo("/contact")} className="cursor-pointer">Contact</p>
+
+                    {isAdmin && (
+                        <p
+                            onClick={() => goTo("/admin")}
+                            className="cursor-pointer text-red-600 font-semibold flex items-center gap-2"
+                        >
+                            <ShieldCheck size={18} /> Admin
+                        </p>
+                    )}
+
+                    <hr />
+
+                    {!isSignedIn && (
+                        <button
+                            onClick={openSignIn}
+                            className="w-full py-2 rounded-lg bg-primary text-white"
+                        >
+                            Sign In
+                        </button>
+                    )}
+
+                    {isSignedIn && !registered && !isAdmin && (
+                        <button
+                            onClick={handleRegister}
+                            className="w-full py-2 rounded-lg bg-primary text-white"
+                        >
+                            Register Now
+                        </button>
+                    )}
+
+                    {isSignedIn && registered && !isAdmin &&
+                        (paymentStatus === "NOT_PAID" || paymentStatus === "REJECTED") && (
+                            <button
+                                onClick={handlePayment}
+                                className="w-full py-2 rounded-lg bg-primary text-white"
+                            >
+                                Proceed to Payment
+                            </button>
+                        )
+                    }
+
+                    {isSignedIn && registered && !isAdmin &&
+                        (paymentStatus === "PENDING" || paymentStatus === "APPROVED") && (
+                            <button
+                                onClick={onOpenStatus}
+                                className="w-full py-2 rounded-lg bg-primary text-white"
+                            >
+                                Check Status
+                            </button>
+                        )
+                    }
+
+                    {isSignedIn && <UserButton />}
+                </div>
+            </div>
+        </header>
     );
 };
 

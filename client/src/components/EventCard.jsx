@@ -6,8 +6,9 @@ const EventCard = ({ event }) => {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer md:h-auto md:w-80 md:hover:scale-110 md:active:scale-100 transition">
             <div className="aspect-video relative">
                 <img
-                    src="/gradientBackground.png"
+                    src={event.banner}
                     alt={event.name}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
@@ -27,7 +28,7 @@ const EventCard = ({ event }) => {
                     </p>
                     <p className="flex items-center gap-2">
                         <Users className="h-4 text-primary" />
-                        Team: {event.noOfPart}
+                        Team: Max {event.noOfPart} Participants
                     </p>
                 </div>
 

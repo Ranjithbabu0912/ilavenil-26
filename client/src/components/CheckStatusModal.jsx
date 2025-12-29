@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 
 const CheckStatusModal = ({ onClose }) => {
     const [email, setEmail] = useState("");
@@ -10,7 +11,9 @@ const CheckStatusModal = ({ onClose }) => {
 
     const { user, isLoaded } = useUser();
 
-    // ✅ Auto-fill email from logged-in user
+    const navigate = useNavigate();
+
+    // Auto-fill email from logged-in user
     useEffect(() => {
         if (!isLoaded) return;
 
@@ -60,7 +63,7 @@ const CheckStatusModal = ({ onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white p-6 rounded-lg w-80 shadow-2xl relative">
 
                 <button
@@ -101,6 +104,16 @@ const CheckStatusModal = ({ onClose }) => {
                         <p className="text-center text-xs mt-2">
                             {statusColor[status][1]}
                         </p>
+                        {
+                            status === "APPROVED" ? (
+                                <button
+                                    onClick={() => navigate('/my-qr')}
+                                    className="bg-blue-600 mt-2 text-white w-full py-2 rounded cursor-pointer"
+                                >
+                                    Download QR
+                                </button>
+                            ) : ""
+                        }
                     </div>
                 )}
 

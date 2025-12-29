@@ -1,13 +1,16 @@
 import { Navigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
+import { isAdminUser } from "../utils/isAdmin";
 
 const ProtectedRoute = ({ children }) => {
-    const { isSignedIn, isLoaded } = useUser();
+    const { user, isSignedIn, isLoaded } = useUser();
 
-    if (!isLoaded) return null; // or loading spinner
+    if (!isLoaded) return null;
+    if (!isSignedIn) return <Navigate to="/sign-in" replace />;
 
-    if (!isSignedIn) {
-        return <Navigate to="/sign-in" replace />;
+    // 🔥 BLOCK ADMIN FROM USER FLOWS
+    if (isAdminUser(user)) {
+        return <Navigate to="/admin/dashboard" replace />;
     }
 
     return children;

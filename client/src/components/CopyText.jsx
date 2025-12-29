@@ -1,24 +1,30 @@
-import { useState } from "react";
+import { Copy } from "lucide-react";
+import { toast } from "react-toastify";
 
-export default function CopyText({ text }) {
-    // const text = "ilavenil26@upi";
-    const [copied, setCopied] = useState(false);
+const CopyText = ({ text }) => {
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied!");
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
 
-    const handleCopy = async () => {
-        await navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
-    };
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span className="font-medium">{text}</span>
 
-    return (
-        <div className="flex items-center gap-2">
-            <span className="font-bold">{text}</span>
-            <button
-                onClick={handleCopy}
-                className="px-2 py-1 text-sm bg-black text-white rounded"
-            >
-                {copied ? "Copied!" : "Copy"}
-            </button>
-        </div>
-    );
-}
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="p-1 rounded hover:bg-gray-100"
+        aria-label="Copy"
+      >
+        <Copy size={16} />
+      </button>
+    </span>
+  );
+};
+
+export default CopyText;
