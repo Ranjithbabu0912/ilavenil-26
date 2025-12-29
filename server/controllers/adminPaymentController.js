@@ -1,7 +1,5 @@
 import EventRegistration from "../models/eventRegistration.js";
 import crypto from "crypto";
-// import { generateAttendanceQR } from "../utils/generateQR.js";
-// import { sendPaymentVerifiedMail } from "../utils/sendVerifiedMail.js";
 
 // 🔹 Get all pending payments
 export const getPendingPayments = async (req, res) => {

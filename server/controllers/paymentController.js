@@ -1,5 +1,5 @@
 import EventRegistration from "../models/eventRegistration.js";
-import { isValidUTR } from "../utils/validateUtr.js";
+import { isValidUTR } from "../utils/validateUTR.js";
 
 export const submitPayment = async (req, res) => {
   try {
