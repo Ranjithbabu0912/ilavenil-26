@@ -1,6 +1,10 @@
 export const adminProtect = (req, res, next) => {
-    if (req.user?.role !== "admin") {
-        return res.status(403).json({ message: "Admin only" });
+    try {
+        if (!req.user || req.user.role !== "admin") {
+            return res.status(403).json({ success: false, message: "Admin only" });
+        }
+        next();
+    } catch (err) {
+        return res.status(403).json({ success: false });
     }
-    next();
-};
+};  
