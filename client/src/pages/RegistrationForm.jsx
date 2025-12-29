@@ -114,17 +114,17 @@ const RegistrationForm = () => {
 
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
 
-    
+
     useEffect(() => {
         if (!isLoaded) return;
-        
+
         // 🔐 Not logged in → Sign in
         if (!isSignedIn) {
             navigate("/sign-in");
             return;
         }
         const API_URL = import.meta.env.VITE_API_URL;
-        
+
         // 🔁 Check if already registered
         const checkRegistration = async () => {
             try {
@@ -134,9 +134,9 @@ const RegistrationForm = () => {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email: userEmail }),
-                    }
-                );
-
+                    })
+                    .then(res => res.json())
+                    .then(console.log);
                 const data = await res.json();
 
                 if (data.success) {
