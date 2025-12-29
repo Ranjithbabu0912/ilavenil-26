@@ -39,42 +39,33 @@ export const checkPaymentStatus = async (req, res) => {
   try {
     const { email } = req.body || {};
 
-    console.log("Checking registration for:", email);
-
-
-    // 1️⃣ Validate input
+    // ❗ Silent exit if no email
     if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Email is required",
-      });
+      return res.status(200).json({ success: false });
     }
 
-    // 2️⃣ Find registration
     const registration = await EventRegistration.findOne({ email });
 
+    // ❗ Silent exit if not registered
     if (!registration) {
-      return res.status(404).json({
-        success: false,
-        message: "Registration not found",
-      });
+      return res.status(200).json({ success: false });
     }
 
-    // 3️⃣ Safe access
-    const paymentStatus = registration.payment?.status || "pending";
+    // ✅ SAFE access (no crash)
+    const paymentStatus = registration.payment?.status || "NOT_PAID";
 
-    // 4️⃣ Success response
     return res.status(200).json({
       success: true,
       status: paymentStatus,
       registrationId: registration._id,
     });
-  } catch (err) {
-    console.error("checkPaymentStatus ERROR:", err);
 
-    return res.status(500).json({
+  } catch (err) {
+    // 🔥 NEVER crash the client
+    console.error("checkPaymentStatus error:", err);
+
+    return res.status(200).json({
       success: false,
-      message: "Internal server error",
     });
   }
 };
