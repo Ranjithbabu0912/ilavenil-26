@@ -52,14 +52,8 @@ const App = () => {
         <Route path="/rules_and_guidelines" element={<Rules />} />
 
         {/* USER PROTECTED */}
-        <Route
-          path="/RegistrationForm"
-          element={
-            <ProtectedRoute>
-              <RegistrationForm />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/register" element={<RegistrationForm />} />
+
 
         <Route
           path="/my-qr"

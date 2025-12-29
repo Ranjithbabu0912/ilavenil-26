@@ -12,6 +12,7 @@ const Hero = () => {
     const { user, isLoaded, isSignedIn } = useUser();
 
     const [registered, setRegistered] = useState(false);
+    
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
 
     useEffect(() => {
@@ -45,7 +46,7 @@ const Hero = () => {
             return;
         }
 
-        navigate("/RegistrationForm");
+        navigate("/register");
     };
 
 

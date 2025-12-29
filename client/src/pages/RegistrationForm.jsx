@@ -129,10 +129,16 @@ const RegistrationForm = () => {
         const checkRegistration = async () => {
             try {
                 const res = await fetch(
-                    `${API_URL}/api/events/check-status?email=${encodeURIComponent(userEmail)}`,
+                    `${API_URL}/api/events/check-status`,
                     {
-                        method: "GET",
+                        method: "POST",
                         credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: userEmail,
+                        }),
                     }
                 );
 

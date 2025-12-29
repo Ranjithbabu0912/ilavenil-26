@@ -64,7 +64,7 @@ const EventDetails = () => {
                         {event.desc}
                     </p>
 
-                    <button className="mt-6 px-8 py-3 bg-primary rounded-full hover:bg-blue-600 text-white hover:scale-105 active:scale-90 transition cursor-pointer" onClick={user ? () => navigate('/RegistrationForm') : openSignIn}>
+                    <button className="mt-6 px-8 py-3 bg-primary rounded-full hover:bg-blue-600 text-white hover:scale-105 active:scale-90 transition cursor-pointer" onClick={user ? () => navigate('/register') : openSignIn}>
                         Register Now
                     </button>
                 </div>

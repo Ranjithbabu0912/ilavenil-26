@@ -28,12 +28,21 @@ const Navbar = ({ onOpenStatus }) => {
         if (!isLoaded || !isSignedIn || !userEmail) return;
 
         const fetchStatus = async () => {
+
+            const API_URL = import.meta.env.VITE_API_URL;
+
             try {
                 const res = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/events/check-status?email=${encodeURIComponent(userEmail)}`,
+                    `${API_URL}/api/events/check-status`,
                     {
-                        method: "GET",
+                        method: "POST",
                         credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: userEmail,
+                        }),
                     }
                 );
 
@@ -66,7 +75,7 @@ const Navbar = ({ onOpenStatus }) => {
 
     const handleRegister = () => {
         setIsMenuOpen(false);
-        navigate("/RegistrationForm");
+        navigate("/register");
     };
 
     const handlePayment = () => {
