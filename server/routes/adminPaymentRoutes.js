@@ -1,6 +1,5 @@
 import express from "express";
 import { attachUser } from "../middlewares/attachUser.js";
-import { adminProtect } from "../middlewares/adminAuth.js";
 import { clerkProtect } from '../middlewares/authMiddleware.js'
 import {
     getPendingPayments,
@@ -22,19 +21,15 @@ router.get(
 
 router.patch(
     "/payments/:id/approve",
-    clerkProtect,
     adminOnly,
     attachUser,
-    adminProtect,
     approvePayment
 );
 
 router.patch(
     "/payments/:id/reject",
-    clerkProtect,
     adminOnly,
     attachUser,
-    adminProtect,
     rejectPayment
 );
 
