@@ -1,5 +1,5 @@
 import express from "express";
-import corsMiddleware from "./config/cors.js";
+// import corsMiddleware from "./config/cors.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import adminPaymentRoutes from "./routes/adminPaymentRoutes.js";
@@ -44,7 +44,7 @@ app.options("*", cors());
 
 
 
-app.use(corsMiddleware);
+// app.use(corsMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
