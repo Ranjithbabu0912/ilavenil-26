@@ -114,20 +114,22 @@ const RegistrationForm = () => {
 
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
 
+    
     useEffect(() => {
         if (!isLoaded) return;
-
+        
         // 🔐 Not logged in → Sign in
         if (!isSignedIn) {
             navigate("/sign-in");
             return;
         }
-
+        const API_URL = import.meta.env.VITE_API_URL;
+        
         // 🔁 Check if already registered
         const checkRegistration = async () => {
             try {
                 const res = await fetch(
-                    "http://localhost:5000/api/events/check-status",
+                    `${API_URL}/api/events/check-status`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
