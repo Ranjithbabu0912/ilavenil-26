@@ -8,6 +8,7 @@ const router = express.Router();
 // 🔥 THIS IS THE MISSING ROUTE
 router.post(
     "/attendance",
+    clerkProtect,
     adminOnly,
     markAttendance
 );
