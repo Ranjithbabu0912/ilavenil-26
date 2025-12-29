@@ -14,33 +14,29 @@ import path from "path";
 
 const app = express();
 
-/* ✅ Allowed origins */
 const allowedOrigins = [
     "https://ilavenil-26.vercel.app",
     "http://localhost:5173"
 ];
 
-/* ✅ CORS middleware */
 app.use(
     cors({
-        origin: function (origin, callback) {
-            // allow server-to-server & Postman
+        origin: (origin, callback) => {
             if (!origin) return callback(null, true);
-
             if (allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
-                callback(new Error("Not allowed by CORS"));
+                callback(new Error("CORS blocked"));
             }
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        allowedHeaders: ["Content-Type", "Authorization"]
     })
 );
 
-/* ✅ IMPORTANT: Preflight handler */
-app.options("*", cors());
+
+app.use(cors());
 
 
 
