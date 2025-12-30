@@ -7,19 +7,20 @@ const allowedOrigins = [
 
 const corsMiddleware = cors({
   origin: (origin, callback) => {
-    // allow browser, postman, server calls
+    // Allow non-browser requests (Postman, server-to-server)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    // 🔥 DO NOT BLOCK – allow but rely on auth instead
+    // Allow others, rely on auth
     return callback(null, true);
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // ✅ PATCH added
   allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204, // ✅ Vercel-friendly
 });
 
 export default corsMiddleware;
