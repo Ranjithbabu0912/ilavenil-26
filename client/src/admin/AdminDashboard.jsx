@@ -135,7 +135,7 @@ const AdminDashboard = () => {
 
                             {reg.payment?.screenshot && (
                                 <a
-                                    href={`${import.meta.env.VITE_API_URL}/uploads/payments/${reg.payment.screenshot}`}
+                                    href={`${reg.payment.screenshot}`}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="text-indigo-600 text-sm mt-2 inline-block"
@@ -150,14 +150,14 @@ const AdminDashboard = () => {
                                     <button
                                         disabled={loadingId === reg._id}
                                         onClick={() => handleApprove(reg._id)}
-                                        className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm"
+                                        className="flex-1 bg-green-600 cursor-pointer text-white py-2 rounded-lg text-sm"
                                     >
                                         Approve
                                     </button>
                                     <button
                                         disabled={loadingId === reg._id}
                                         onClick={() => handleReject(reg._id)}
-                                        className="flex-1 bg-red-600 text-white py-2 rounded-lg text-sm"
+                                        className="flex-1 bg-red-600 cursor-pointer text-white py-2 rounded-lg text-sm"
                                     >
                                         Reject
                                     </button>

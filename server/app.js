@@ -15,7 +15,7 @@ const app = express();
 
 
 app.use(corsMiddleware);
-app.options("*", corsMiddleware);
+app.options(/.*/, corsMiddleware);
 
 
 app.use(express.json());
