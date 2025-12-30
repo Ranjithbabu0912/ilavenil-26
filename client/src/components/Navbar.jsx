@@ -165,7 +165,7 @@ const Navbar = ({ onOpenStatus = () => {} }) => {
                 </nav>
 
                 {/* DESKTOP ACTIONS */}
-                <div className="hidden md:flex gap-3 items-center">
+                <div className="hidden md:flex gap-3 z-10 items-center">
 
                     {!isSignedIn && (
                         <button
