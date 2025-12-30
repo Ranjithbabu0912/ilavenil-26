@@ -4,7 +4,7 @@ import { ArrowRight, ShieldCheck, Menu, X } from "lucide-react";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 
-const Navbar = ({ onOpenStatus }) => {
+const Navbar = ({ onOpenStatus = () => {} }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { openSignIn } = useClerk();
@@ -90,8 +90,7 @@ const Navbar = ({ onOpenStatus }) => {
             navigate(`/payment/${registrationId}`);
             return;
         }
-
-        // 🟡 Payment pending / approved → open status modal
+        
         if (
             paymentStatus === "PENDING" ||
             paymentStatus === "APPROVED"

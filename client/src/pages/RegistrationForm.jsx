@@ -148,10 +148,8 @@ const RegistrationForm = () => {
                         navigate("/");
                     }
                 }
-
-                // ❗ If not registered → DO NOTHING (silent flow)
+                
             } catch (err) {
-                // ❗ Completely silent
                 console.warn("Registration check skipped");
             }
         };
