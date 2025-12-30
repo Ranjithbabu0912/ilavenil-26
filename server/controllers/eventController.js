@@ -80,3 +80,13 @@ export const checkPaymentStatus = async (req, res) => {
     return res.status(200).json({ success: false });
   }
 };
+
+export const getAllRegistration = async (req, res) => {
+  
+  try {
+    const registrations = await EventRegistration.find().sort({ createdAt: -1 });
+    res.json({ registrations });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch registrations" });
+  }
+}

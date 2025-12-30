@@ -1,5 +1,6 @@
 import { GithubIcon, Globe, Instagram, LucideLinkedin } from 'lucide-react'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Footer = () => {
 
@@ -21,7 +22,7 @@ const Footer = () => {
                     <p className='text-gray-500 text-xs'>Step into an exciting MBA & MCA intercollegiate meet packed with management battles, tech challenges, creative events, and innovation showcases.</p>
                     <p>Follow us</p>
                     <div>
-                        <a href="" className='flex items-center gap-3'>
+                        <a href="http://instagram.com/ilavenil.26" target='_blank' className='flex items-center gap-3'>
                             <p className='bg-primary h-10 w-10 rounded-full text-white flex items-center justify-center'><Instagram className='' /></p>
                             <p className='text-lg hover:text-primary'>@ilavenil.26</p>
                         </a>

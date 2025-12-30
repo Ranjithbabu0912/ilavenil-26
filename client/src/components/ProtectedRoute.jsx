@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }) => {
 
     // 🔥 BLOCK ADMIN FROM USER FLOWS
     if (isAdminUser(user)) {
-        return <Navigate to="/admin/dashboard" replace />;
+        return <Navigate to="/admin" replace />;
     }
 
     return children;

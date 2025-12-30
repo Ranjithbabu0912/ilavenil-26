@@ -23,6 +23,8 @@ import UserRoute from "./components/UserRoute";
 import MyQR from "./components/MyQR";
 import AdminLayout from "./admin/AdminLayout";
 import ScrollToTop from "./components/ScrollTop";
+import AdminLiveCounter from "./admin/AdminLiveCounter";
+import AdminRegistrationsTable from "./admin/AdminRegistrationsTable";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -75,30 +77,47 @@ const App = () => {
 
         <Route path="/success" element={<Success />} />
 
+
         {/* 🔥 ADMIN ONLY */}
 
-
-
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }>
           <Route
             path="payments"
             element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
+              <AdminDashboard />
             }
           />
           <Route
             path="attendance"
             element={
-              <AdminRoute>
-                <AdminQRScanner />
-              </AdminRoute>
+              <AdminQRScanner />
             }
           />
+
+          <Route
+            path="analysis"
+            element={
+              <AdminLiveCounter />
+            }
+          />
+
+          <Route
+            path="applications"
+            element={
+              <AdminRegistrationsTable />
+            }
+          />
+
+
+
         </Route>
+
       </Routes>
-    </div>
+    </div >
   );
 };
 

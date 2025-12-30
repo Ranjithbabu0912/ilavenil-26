@@ -6,6 +6,7 @@ import adminPaymentRoutes from "./routes/adminPaymentRoutes.js";
 import qrAttendanceRoutes from './routes/qrAttendanceRoutes.js';
 import userRoutes from "./routes/userRoutes.js";
 import adminAttendanceRoutes from "./routes/adminAttendanceRoutes.js";
+import adminStatsRoutes from "./routes/adminStatsRoutes.js";
 import { fileURLToPath } from "url";
 import path from "path";
 
@@ -29,8 +30,9 @@ const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", qrAttendanceRoutes);
 
-app.use("/api/events", eventRoutes);
+app.use("/api/admin", adminStatsRoutes);
 
+app.use("/api/events", eventRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminPaymentRoutes);
 app.use("/api", userRoutes);

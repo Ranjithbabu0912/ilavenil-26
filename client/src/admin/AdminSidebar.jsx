@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { CreditCard, QrCode, LogOut, Menu, X } from "lucide-react";
+import { CreditCard, QrCode, LogOut, X, ChartArea, NotepadText } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 
 const AdminSidebar = ({ open, setOpen }) => {
@@ -58,6 +58,30 @@ const AdminSidebar = ({ open, setOpen }) => {
                     </NavLink>
 
                     <NavLink
+                        to="/admin/analysis"
+                        className={({ isActive }) =>
+                            `${baseLink} ${isActive ? active : "text-gray-700 hover:bg-indigo-100"
+                            }`
+                        }
+                        onClick={() => setOpen(false)}
+                    >
+                        <ChartArea size={20} />
+                        Analysis
+                    </NavLink>
+
+                    <NavLink
+                        to="/admin/applications"
+                        className={({ isActive }) =>
+                            `${baseLink} ${isActive ? active : "text-gray-700 hover:bg-indigo-100"
+                            }`
+                        }
+                        onClick={() => setOpen(false)}
+                    >
+                        <NotepadText size={20} />
+                        Applications
+                    </NavLink>
+
+                    <NavLink
                         to="/admin/attendance"
                         className={({ isActive }) =>
                             `${baseLink} ${isActive ? active : "text-gray-700 hover:bg-indigo-100"
@@ -68,6 +92,8 @@ const AdminSidebar = ({ open, setOpen }) => {
                         <QrCode size={20} />
                         QR Attendance
                     </NavLink>
+
+
                 </nav>
 
                 {/* Footer */}
