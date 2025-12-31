@@ -2,11 +2,13 @@ import EventRegistration from "../models/eventRegistration.js";
 import crypto from "crypto";
 import cloudinary from "../config/cloudinary.js";
 import { sendPaymentConfirmationEmail } from "../utils/sendRegistrationEmail.js";
+import connectDB from "../config/db.js";
 
 
 // 🔹 Get all pending payments
 export const getPendingPayments = async (req, res) => {
   try {
+    await connectDB();
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 5;
     const search = req.query.search?.trim();
@@ -49,8 +51,12 @@ export const getPendingPayments = async (req, res) => {
   }
 };
 
+
 export const getPayments = async (req, res) => {
   try {
+
+    await connectDB();
+    
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 5;
     const search = req.query.search?.trim();
@@ -93,7 +99,6 @@ export const getPayments = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 
 
