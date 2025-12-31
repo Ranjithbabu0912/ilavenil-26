@@ -1,41 +1,64 @@
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { useAuth, useUser } from "@clerk/clerk-react";
+
+
+/* 🔊 Sound files (put these in /public folder) */
+const successSound = new Audio("/success.mp3");
+const errorSound = new Audio("/error.mp3");
+
+/* 📳 Vibration helper */
+const vibrate = (pattern = [200]) => {
+    if (navigator.vibrate) {
+        navigator.vibrate(pattern);
+    }
+};
 
 const AdminQRScanner = () => {
     const { getToken } = useAuth();
+    const { user } = useUser();
+    const scannerRef = useRef(null);
 
     const [participant, setParticipant] = useState(null);
     const [alreadyMarked, setAlreadyMarked] = useState(false);
     const [markedStatus, setMarkedStatus] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
+    const [scanLocked, setScanLocked] = useState(false);
 
-    // 🔹 Initialize QR Scanner
+    /* 🔹 Initialize QR Scanner */
     useEffect(() => {
-        const scanner = new Html5QrcodeScanner(
+        scannerRef.current = new Html5QrcodeScanner(
             "qr-reader",
             {
-                fps: 10,
+                fps: 5,                 // 🔥 Lower FPS for mobile safety
                 qrbox: 250,
                 rememberLastUsedCamera: true,
             },
             false
         );
 
-        scanner.render(onScanSuccess, () => { });
+        scannerRef.current.render(onScanSuccess, onScanError);
 
         return () => {
-            scanner.clear().catch(() => { });
+            scannerRef.current?.clear().catch(() => { });
         };
+        // eslint-disable-next-line
     }, []);
 
-    // 🔹 Handle QR Scan
+    /* ❌ Ignore scan errors */
+    const onScanError = () => { };
+
+    /* 🔹 Handle QR Scan */
     const onScanSuccess = async (decodedText) => {
+        if (scanLocked) return;      // 🔥 STOP MULTI-SCAN
+        setScanLocked(true);
+
         try {
             setMessage("");
             setParticipant(null);
+            setAlreadyMarked(false);
 
             const qrToken = decodedText.split("/").pop();
 
@@ -56,9 +79,15 @@ const AdminQRScanner = () => {
             const data = await res.json();
 
             if (!res.ok) {
+                errorSound.play();
+                vibrate([300, 100, 300]);
                 setMessage(data.message || "Scan failed");
+                setScanLocked(false);
                 return;
             }
+
+            successSound.play();
+            vibrate([200, 100, 200]);
 
             if (data.alreadyMarked) {
                 setParticipant(data.participant);
@@ -68,17 +97,32 @@ const AdminQRScanner = () => {
             } else {
                 setParticipant(data.participant);
                 setAlreadyMarked(false);
-                setMarkedStatus("");
             }
+
+            // 🔓 Allow next scan after delay
+            setTimeout(() => setScanLocked(false), 4000);
+
         } catch (err) {
             console.error(err);
+            errorSound.play();
+            vibrate([400]);
             setMessage("Unable to scan QR");
+            setScanLocked(false);
         }
     };
 
-    // 🔹 Manual Attendance Mark
+    /* 🔹 Manual Attendance Mark */
     const markAttendance = async (status) => {
-        if (!participant) return;
+        if (!participant || loading) return;
+
+
+        const adminName =
+            user?.fullName ||
+            user?.username ||
+            user?.primaryEmailAddress?.emailAddress ||
+            "Admin";
+
+
 
         try {
             setLoading(true);
@@ -101,6 +145,7 @@ const AdminQRScanner = () => {
                         email: participant.email,
                         event: participant.event,
                         status,
+                        markedBy: adminName,
                     }),
                 }
             );
@@ -108,18 +153,24 @@ const AdminQRScanner = () => {
             const data = await res.json();
 
             if (!res.ok) {
+                errorSound.play();
+                vibrate([300, 100, 300]);
                 setMessage(data.message || "Failed to mark attendance");
                 return;
             }
 
-            const isPresent = status === "PRESENT";
+            successSound.play();
+            vibrate([200, 100, 200]);
 
-            setMessage(`Marked ${status}`);
-            isPresent ? toast.success(`Marked ${status}`) : toast.error(`Marked ${status}`);
+            toast.success(`Marked ${status} by ${adminName}`);
+            setMessage(`Marked ${status} by ${adminName}`);
             setParticipant(null);
             setAlreadyMarked(false);
+
         } catch (err) {
             console.error(err);
+            errorSound.play();
+            vibrate([400]);
             setMessage("Server error");
         } finally {
             setLoading(false);
@@ -132,10 +183,10 @@ const AdminQRScanner = () => {
                 Admin Attendance Scanner
             </h1>
 
-            {/* QR Scanner */}
+            {/* 🔍 QR Scanner */}
             <div id="qr-reader" className="border rounded mb-4" />
 
-            {/* Participant Card */}
+            {/* 👤 Participant Card */}
             {participant && (
                 <div className="bg-white shadow rounded p-4">
                     <h3 className="font-semibold">{participant.name}</h3>
@@ -143,7 +194,12 @@ const AdminQRScanner = () => {
                     <p className="text-sm">Event: {participant.event}</p>
 
                     {alreadyMarked ? (
-                        <p className={`mt-3 font-semibold ${markedStatus === "PRESENT" ? 'text-green-500' : 'text-red-600'}`}>
+                        <p
+                            className={`mt-3 font-semibold ${markedStatus === "PRESENT"
+                                ? "text-green-600"
+                                : "text-red-600"
+                                }`}
+                        >
                             Already marked: {markedStatus}
                         </p>
                     ) : (
@@ -151,7 +207,7 @@ const AdminQRScanner = () => {
                             <button
                                 disabled={loading}
                                 onClick={() => markAttendance("PRESENT")}
-                                className="flex-1 bg-green-600 text-white py-2 rounded disabled:opacity-50"
+                                className="flex-1 bg-green-600 cursor-pointer text-white py-2 rounded disabled:opacity-50"
                             >
                                 Present
                             </button>
@@ -159,7 +215,7 @@ const AdminQRScanner = () => {
                             <button
                                 disabled={loading}
                                 onClick={() => markAttendance("ABSENT")}
-                                className="flex-1 bg-red-600 text-white py-2 rounded disabled:opacity-50"
+                                className="flex-1 bg-red-600 cursor-pointer text-white py-2 rounded disabled:opacity-50"
                             >
                                 Absent
                             </button>
@@ -168,7 +224,7 @@ const AdminQRScanner = () => {
                 </div>
             )}
 
-            {/* Message */}
+            {/* ℹ️ Message */}
             {message && (
                 <p className="mt-4 text-center font-semibold text-indigo-600">
                     {message}
