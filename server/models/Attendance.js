@@ -16,6 +16,10 @@ const attendanceSchema = new mongoose.Schema(
             required: true,
         },
         markedVia: String,
+        markedBy: {
+            type: String, // 🔥 Admin Name
+            required: true,
+        },
     },
     { timestamps: true }
 );

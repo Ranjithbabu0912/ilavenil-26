@@ -1,9 +1,11 @@
+import connectDB from "../config/db.js";
 import Attendance from "../models/Attendance.js";
 import EventRegistration from "../models/eventRegistration.js";
 
 export const markAttendance = async (req, res) => {
     try {
-        // console.log("ATTENDANCE BODY:", req.body);
+        // 🔥 CRITICAL FOR VERCEL
+        await connectDB();
 
         const {
             registrationId,
@@ -11,9 +13,10 @@ export const markAttendance = async (req, res) => {
             email,
             event,
             status,
+            markedBy
         } = req.body;
 
-        // 🔥 VALIDATION (most common crash cause)
+        // 🔥 VALIDATION
         if (!registrationId || !status) {
             return res.status(400).json({
                 message: "Missing registrationId or status",
@@ -27,7 +30,10 @@ export const markAttendance = async (req, res) => {
         }
 
         // 🔥 Ensure registration exists
-        const reg = await EventRegistration.findById(registrationId);
+        const reg = await EventRegistration
+            .findById(registrationId)
+            .maxTimeMS(5000);
+
         if (!reg) {
             return res.status(404).json({
                 message: "Registration not found",
@@ -35,9 +41,9 @@ export const markAttendance = async (req, res) => {
         }
 
         // 🔥 Prevent duplicate attendance
-        const alreadyMarked = await Attendance.findOne({
-            registrationId,
-        });
+        const alreadyMarked = await Attendance
+            .findOne({ registrationId })
+            .maxTimeMS(5000);
 
         if (alreadyMarked) {
             return res.status(400).json({
@@ -53,15 +59,17 @@ export const markAttendance = async (req, res) => {
             event: event || reg.events?.primary,
             status,
             markedVia: "QR_ADMIN",
+            markedBy
         });
 
         res.json({
             success: true,
-            message: `Marked ${status}`,
+            message: `Marked ${status} by ${markedBy}`,
         });
+
     } catch (err) {
         console.error("🔥 ATTENDANCE CONTROLLER ERROR:", err);
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server error",
         });
     }

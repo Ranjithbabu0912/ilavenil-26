@@ -1,6 +1,7 @@
 import connectDB from "../config/db.js";
 import EventRegistration from "../models/eventRegistration.js";
 
+
 /* ================= CREATE REGISTRATION ================= */
 
 export const createRegistration = async (req, res) => {
@@ -82,7 +83,7 @@ export const checkPaymentStatus = async (req, res) => {
 };
 
 export const getAllRegistration = async (req, res) => {
-  
+
   try {
     const registrations = await EventRegistration.find().sort({ createdAt: -1 });
     res.json({ registrations });

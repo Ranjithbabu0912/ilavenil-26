@@ -1,6 +1,8 @@
 import EventRegistration from "../models/eventRegistration.js";
 import crypto from "crypto";
 import cloudinary from "../config/cloudinary.js";
+import { sendPaymentConfirmationEmail } from "../utils/sendRegistrationEmail.js";
+
 
 // 🔹 Get all pending payments
 export const getPendingPayments = async (req, res) => {
@@ -109,34 +111,31 @@ export const approvePayment = async (req, res) => {
 
     // ✅ Approve payment
     reg.payment.status = "APPROVED";
+    reg.payment.verifiedAt = new Date();
 
     // 🔥 Generate QR token
     reg.qrToken = crypto.randomBytes(16).toString("hex");
 
     await reg.save();
 
-    // 🔳 QR payload
-    const qrPayload = {
-      registrationId: reg._id,
-      name: reg.name,
-      email: reg.email,
-      qrToken: reg.qrToken,
-    };
-
-    // 🔳 Generate QR image
-    // const qrDataURL = await generateAttendanceQR(qrPayload);
-
-    // ✉️ Send mail
-    // await sendPaymentVerifiedMail({
-    //   email: reg.email,
-    //   name: reg.name,
-    //   qrDataURL,
-    // });
+    // ✉️ SEND CONFIRMATION EMAIL (NON-BLOCKING)
+    try {
+      await sendPaymentConfirmationEmail({
+        to: reg.email,
+        name: reg.name,
+        registrationId: reg._id,
+        event: reg.events?.primary,
+      });
+    } catch (emailErr) {
+      console.error("❌ Email failed:", emailErr.message);
+      // ❗ Do NOT fail payment approval
+    }
 
     res.json({
       success: true,
-      message: "Payment approved & email sent",
+      message: "Payment approved & confirmation email sent",
     });
+
   } catch (err) {
     console.error("APPROVAL ERROR:", err);
     res.status(500).json({ message: "Approval failed" });
@@ -148,13 +147,20 @@ export const approvePayment = async (req, res) => {
 
 
 export const rejectPayment = async (req, res) => {
-  await EventRegistration.findByIdAndUpdate(req.params.id, {
-    "payment.status": "REJECTED",
-  });
+  const reg = await EventRegistration.findById(req.params.id);
 
-  await cloudinary.uploader.destroy(
-    registration.payment.screenshotPublicId
-  );
+  if (!reg) {
+    return res.status(404).json({ message: "Not found" });
+  }
+
+  if (reg.payment?.screenshotPublicId) {
+    await cloudinary.uploader.destroy(
+      reg.payment.screenshotPublicId
+    );
+  }
+
+  reg.payment.status = "REJECTED";
+  await reg.save();
+
   res.json({ success: true });
 };
-
