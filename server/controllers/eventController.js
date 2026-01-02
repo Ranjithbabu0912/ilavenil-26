@@ -20,6 +20,7 @@ export const createRegistration = async (req, res) => {
     const existingRegistration = await EventRegistration.findOne({ email });
 
     if (existingRegistration) {
+      localStorage.setItem('registeredEmail', existingRegistration);
       return res.status(409).json({
         success: false,
         message: "This email is already registered",

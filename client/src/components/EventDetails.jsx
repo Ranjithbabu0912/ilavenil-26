@@ -129,9 +129,9 @@ const EventDetails = () => {
                                         {person.role}
                                     </p>
 
-                                    <p className="text-gray-500 text-sm">
-                                        {person.contact}
-                                    </p>
+                                    <a href={`tel:${person.contact}`} className="text-gray-500 text-sm">
+                                        +{person.contact.slice(0, 2)} {person.contact.slice(2, 7)} {person.contact.slice(7, 12)}
+                                    </a>
                                 </div>
 
                             </div>

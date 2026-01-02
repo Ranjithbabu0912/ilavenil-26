@@ -26,12 +26,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "+91 90876 54321"
+                name: "Varun Kumar Y",
+                contact: "918220672352"
             },
             {
-                name: "name2",
-                contact: "+91 90876 54321"
+                name: "name 2",
+                contact: "918220672352"
             }
         ]
     },
@@ -60,12 +60,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "+91 90876 54321"
+                name: "Mutheeswaran P",
+                contact: "917604874715"
             },
             {
-                name: "name2",
-                contact: "+91 90876 54321"
+                name: "Kaleeshwaran C",
+                contact: "918870091690"
             }
         ]
     },
@@ -94,11 +94,11 @@ export const eventDetails = [
         coOrdinators: [
             {
                 name: "name1",
-                contact: "+91 90876 54321"
+                contact: "919087654321"
             },
             {
                 name: "name2",
-                contact: "+91 90876 54321"
+                contact: "919087654321"
             }
         ]
     },
@@ -128,11 +128,11 @@ export const eventDetails = [
         coOrdinators: [
             {
                 name: "name1",
-                contact: "+91 90876 54321"
+                contact: "919087654321"
             },
             {
                 name: "name2",
-                contact: "+91 90876 54321"
+                contact: "919087654321"
             }
         ]
     },
@@ -162,12 +162,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "+91 90876 54321"
+                name: "Thiyagu G",
+                contact: "919789291124"
             },
             {
-                name: "name2",
-                contact: "+91 90876 54321"
+                name: "Vishnu R",
+                contact: "919629534728"
             }
         ]
     },
@@ -193,19 +193,19 @@ export const eventDetails = [
         coOrdinators: [
             {
                 name: "name1",
-                contact: "+91 90876 54321"
+                contact: "919087654321"
             },
             {
                 name: "name2",
-                contact: "+91 90876 54321"
+                contact: "919087654321"
             }
         ]
     },
     {
         id: 7,
         category: "General",
-        banner: "/up2date.png",
-        name: "Up2Date",
+        banner: "/worldWatch.png",
+        name: "World Watch",
         desc: "A current affairs quiz that evaluates awareness of recent events, technology trends, and global happenings.",
         noOfPart: 1,
         time: "10:30 AM - 12:30 PM",
@@ -223,12 +223,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "+91 90876 54321"
+                name: "Yogesh Prabhu S",
+                contact: "919585678428"
             },
             {
-                name: "name2",
-                contact: "+91 90876 54321"
+                name: "Yesmitha R",
+                contact: "919361354195"
             }
         ]
     },
@@ -262,15 +262,16 @@ export const eventDetails = [
         coOrdinators: [
             {
                 name: "name1",
-                contact: "+91 90876 54321"
+                contact: "+919087654321"
             },
             {
                 name: "name2",
-                contact: "+91 90876 54321"
+                contact: "919087654321"
             },
         ]
     },
 ]
+
 
 export const rulesAndGuidelines = [
     "Participation is open to students from all departments of Arts & Science colleges and Engineering colleges.",

@@ -4,7 +4,7 @@ import { ArrowRight, ShieldCheck, Menu, X } from "lucide-react";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 
-const Navbar = ({ onOpenStatus = () => {} }) => {
+const Navbar = ({ onOpenStatus = () => { } }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { openSignIn } = useClerk();
@@ -21,12 +21,14 @@ const Navbar = ({ onOpenStatus = () => {} }) => {
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
     const isAdmin = user?.publicMetadata?.role === "admin";
 
-    /* 🔁 AUTO CLOSE MENU ON ROUTE CHANGE */
+
+    /* AUTO CLOSE MENU ON ROUTE CHANGE */
     useEffect(() => {
         setIsMenuOpen(false);
     }, [location.pathname]);
 
-    /* 🔍 CHECK REGISTRATION + PAYMENT STATUS */
+
+    /* CHECK REGISTRATION + PAYMENT STATUS */
     useEffect(() => {
         if (!isLoaded || !isSignedIn || !userEmail) return;
 
@@ -70,6 +72,7 @@ const Navbar = ({ onOpenStatus = () => {} }) => {
         fetchStatus();
     }, [isLoaded, isSignedIn, userEmail, isAdmin]);
 
+
     /* 🚦 AUTO FLOW CONTROL (NO UI CHANGE) */
     useEffect(() => {
         if (
@@ -81,7 +84,7 @@ const Navbar = ({ onOpenStatus = () => {} }) => {
             handled
         ) return;
 
-        // 🔴 Payment not done → redirect
+
         if (
             paymentStatus === "NOT_PAID" ||
             paymentStatus === "REJECTED"
@@ -90,7 +93,7 @@ const Navbar = ({ onOpenStatus = () => {} }) => {
             navigate(`/payment/${registrationId}`);
             return;
         }
-        
+
         if (
             paymentStatus === "PENDING" ||
             paymentStatus === "APPROVED"
@@ -282,7 +285,9 @@ const Navbar = ({ onOpenStatus = () => {} }) => {
                         )
                     }
 
-                    {isSignedIn && <UserButton />}
+                    {isSignedIn && <UserButton afterSignOut={() => {
+                        localStorage.removeItem("registeredEmail");
+                    }} />}
                 </div>
             </div>
         </header>

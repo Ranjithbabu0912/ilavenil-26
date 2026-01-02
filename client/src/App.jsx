@@ -25,20 +25,37 @@ import AdminLayout from "./admin/AdminLayout";
 import ScrollToTop from "./components/ScrollTop";
 import AdminLiveCounter from "./admin/AdminLiveCounter";
 import AdminRegistrationsTable from "./admin/AdminRegistrationsTable";
+import RulesModal from "./components/RulesModal/RulesModal";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [openStatus, setOpenStatus] = useState(false);
+  const [showRules, setShowRules] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 4000);
     return () => clearTimeout(t);
   }, []);
 
+
+  useEffect(() => {
+    const hidePopup = localStorage.getItem("hideRulesPopup");
+    if (!hidePopup) {
+      setShowRules(true);
+    }
+  }, []);
+
+
+
   if (loading) return <Loader />;
 
   return (
     <div>
+
+      {showRules && (
+        <RulesModal onClose={() => setShowRules(false)} />
+      )}
+
       <Navbar onOpenStatus={() => setOpenStatus(true)} />
 
       <ScrollToTop />

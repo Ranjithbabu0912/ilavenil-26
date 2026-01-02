@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 mongoose.set("bufferCommands", false);
 
 
-
 import app from "./app.js";
 import connectDB from "./config/db.js";
 

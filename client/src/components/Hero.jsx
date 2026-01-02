@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import '../index.css'
-import { ArrowRight, ChevronsRight, ChevronRight, Clock, MapPin, NotepadText } from 'lucide-react'
+import { ArrowRight, ChevronsRight, MessageCircle, MapPin, CalendarClock } from 'lucide-react'
 import { useClerk, useUser } from '@clerk/clerk-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
+import Countdown from './Countdown/Countdown'
 
 const Hero = () => {
 
@@ -12,15 +13,56 @@ const Hero = () => {
     const { user, isLoaded, isSignedIn } = useUser();
 
     const [registered, setRegistered] = useState(false);
-    
+
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
 
     useEffect(() => {
-        if (!isLoaded || !userEmail) return;
+        if (!isLoaded) return;
 
-        const registeredEmail = localStorage.getItem("registeredEmail");
-        setRegistered(registeredEmail === userEmail);
-    }, [isLoaded, userEmail]);
+        // 🔴 User logged out → reset everything
+        if (!isSignedIn || !userEmail) {
+            setRegistered(false);
+            localStorage.removeItem("registeredEmail");
+            return;
+        }
+
+        const storedEmail = localStorage.getItem("registeredEmail");
+
+        // 🟢 If same user, trust cache
+        if (storedEmail === userEmail) {
+            setRegistered(true);
+            return;
+        }
+
+        // 🔥 Otherwise VERIFY WITH BACKEND
+        const checkRegistration = async () => {
+            try {
+                const res = await fetch(
+                    `${import.meta.env.VITE_API_URL}/api/events/check-status`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: userEmail }),
+                    }
+                );
+
+                const data = await res.json();
+
+                if (data?.success) {
+                    localStorage.setItem("registeredEmail", userEmail);
+                    setRegistered(true);
+                } else {
+                    localStorage.removeItem("registeredEmail");
+                    setRegistered(false);
+                }
+            } catch {
+                setRegistered(false);
+            }
+        };
+
+        checkRegistration();
+    }, [isLoaded, isSignedIn, userEmail]);
+
 
 
     const isAdmin = user?.publicMetadata?.role === "admin";
@@ -51,23 +93,49 @@ const Hero = () => {
 
 
 
+    const REGISTRATION_DEADLINE = new Date("2026-01-20T23:59:59");
+
+    const calculateTimeLeft = () => {
+        const now = new Date();
+        const diff = REGISTRATION_DEADLINE - now;
+
+        if (diff <= 0) {
+            return null; // expired
+        }
+
+        return {
+            days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+            minutes: Math.floor((diff / (1000 * 60)) % 60),
+            seconds: Math.floor((diff / 1000) % 60),
+        };
+    };
+
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft(calculateTimeLeft());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+
+
     return (
         <div>
-            <div className='px-4 sm:px-20 xl:px-32 relative inline-flex items-center w-full justify-around bg-[url(/gradientBackground.png)] bg-cover bg-no-repeat min-h-screen'>
+            <div className='px-4 sm:px-20 xl:px-32 relative inline-flex items-center justify-center w-full bg-[url(/gradientBackground.png)] bg-cover bg-no-repeat min-h-screen'>
 
-                {/* RULES $ GUIDELINES BTN */}
-                <div className='hidden lg:block'>
-                    <button
-                        className='h-40 w-40 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex flex-col items-center justify-center gap-2 border border-gray-400 text-gray-800 hover:shadow-2xl'
-                        onClick={() => navigate('/rules_and_guidelines')}
-                    >
-                        <NotepadText className='text-blue-700 h-20 w-20' />
-                        Rules & Guidelines
-                    </button>
-                </div>
 
                 {/* TEXT CONTENT */}
                 <div className='flex flex-col mt-10'>
+
+                    {/* ⏳ REGISTRATION COUNTDOWN */}
+                    <Countdown timeLeft={timeLeft} />
+
+
 
 
                     <div className='text-center mb-6 gap-3  text-gray-800'>
@@ -75,7 +143,7 @@ const Hero = () => {
                         <p className='text-sm md:text-lg'>A season of young talent</p>
                         <p className='text-xl md:text-3xl'>An Intercollegiate Meet</p>
                         <p className='text-sm md:text-lg'>Organized by</p>
-                        <h1 className='text-xl md:text-3xl'>Department of <span className='font-semibold'>MBA & MCA</span></h1>
+                        <h1 className='text-xl md:text-3xl'>Departments of <span className='font-semibold'>MBA & MCA</span></h1>
                         <h1 className='text-sm md:text-xl '>G.T.N. ARTS COLLEGE (Autonomous), Dindigul.</h1>
 
 
@@ -83,16 +151,28 @@ const Hero = () => {
                         <div className='flex justify-center gap-4 mt-6'>
 
                             <button
-                                className='px-5 py-3 text-xs md:text-sm rounded-lg flex items-center gap-2 bg-primary hover:bg-blue-800 text-white hover:scale-102 active:scale-95 hover:shadow-2xl transition'
                                 onClick={registrationButton}
+                                disabled={!timeLeft}
+                                className={`px-5 py-3 text-xs md:text-sm rounded-lg flex items-center gap-2 transition ${!timeLeft
+                                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                                    : registered
+                                        ? "bg-green-600 text-white cursor-not-allowed"
+                                        : "bg-primary hover:bg-blue-800 text-white hover:scale-102 active:scale-95 hover:shadow-2xl"
+                                    } `}
                             >
-                                {registered ? "Already Registered" : "Register Now"}
-                                {!registered && <ArrowRight />}
+                                {!timeLeft
+                                    ? "Registration Closed"
+                                    : registered
+                                        ? "Already Registered"
+                                        : "Register Now"}
+
+                                {timeLeft && !registered && <ArrowRight />}
                             </button>
 
 
+
                             <button
-                                className='px-5 py-3 text-xs md:text-sm rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border border-primary text-primary hover:shadow-2xl'
+                                className='px-5 py-3 text-xs md:text-sm rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-primary text-primary hover:shadow-2xl hover:bg-primary hover:text-white'
                                 onClick={() => navigate('/events')}
                             >
                                 Explore Events <ChevronsRight />
@@ -107,14 +187,9 @@ const Hero = () => {
 
                         <button
                             onClick={() => navigate('/agenda')}
-                            className='px-5 py-3 rounded-lg text-xs md:text-sm hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-blue-400 text-blue-500 hover:bg-blue-500 hover:text-white hover:shadow-2xl'
+                            className='px-5 py-3 rounded-lg text-xs md:text-sm hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white hover:shadow-2xl'
                         >
-                            Agenda <ChevronRight />
-                        </button>
-
-                        <button
-                            className='px-5 py-3 rounded-lg text-xs md:text-sm flex items-center gap-2 border border-red-300 bg-red-200 text-red-700' >
-                            <Clock />Deadline: Jan 20, 2026
+                            <CalendarClock /> Agenda
                         </button>
 
                         <button
@@ -123,9 +198,24 @@ const Hero = () => {
                                 "_blank",
                                 "noopener,noreferrer"
                             )}
-                            className='px-5 py-3 text-xs md:text-sm rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-green-400 text-green-500 hover:bg-green-500 hover:text-white hover:shadow-2xl'
+                            className='px-5 py-3 text-xs md:text-sm rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-white hover:shadow-2xl'
                         >
-                            Whatsapp <ChevronRight />
+                             <MessageCircle /> Whatsapp
+                        </button>
+
+
+
+                        <button
+                            className='px-5 py-3 rounded-lg text-xs md:text-sm hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-amber-700 text-amber-700 hover:shadow-2xl hover:bg-amber-700 hover:text-white'
+                            onClick={() =>
+                                window.open(
+                                    "https://maps.app.goo.gl/5ae8Sz3KtY123Gep8",
+                                    "_blank",
+                                    "noopener,noreferrer"
+                                )
+                            }
+                        >
+                            <MapPin />View Location
                         </button>
 
                     </div>
@@ -133,18 +223,7 @@ const Hero = () => {
 
                 {/* LOCATION BTN */}
                 <div className='hidden lg:block'>
-                    <button
-                        className='h-40 w-40 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex flex-col items-center justify-center gap-2 border border-blue-400 bg-blue-50 text-blue-600 hover:shadow-2xl'
-                        onClick={() =>
-                            window.open(
-                                "https://maps.app.goo.gl/5ae8Sz3KtY123Gep8",
-                                "_blank",
-                                "noopener,noreferrer"
-                            )
-                        }
-                    >
-                        <MapPin className='h-20 w-20' />View Location
-                    </button>
+
                 </div>
 
             </div>
