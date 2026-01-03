@@ -74,3 +74,43 @@ export const submitPayment = async (req, res) => {
     });
   }
 };
+
+export const retryPayment = async (req, res) => {
+  try {
+    const { utr, screenshotUrl } = req.body;
+
+    if (!utr || !screenshotUrl) {
+      return res.status(400).json({
+        message: "UTR and screenshot are required",
+      });
+    }
+
+    const registration = await EventRegistration.findById(req.user.registrationId);
+
+    if (!registration) {
+      return res.status(404).json({ message: "Registration not found" });
+    }
+
+    if (registration.payment.status !== "REJECTED") {
+      return res.status(400).json({
+        message: "Retry allowed only for rejected payments",
+      });
+    }
+
+    registration.payment.utr = utr;
+    registration.payment.screenshotUrl = screenshotUrl;
+    registration.payment.status = "PENDING";
+    registration.payment.retryCount += 1;
+    registration.payment.lastRetriedAt = new Date();
+
+    await registration.save();
+
+    res.json({
+      success: true,
+      message: "Payment resubmitted for verification",
+    });
+  } catch (err) {
+    console.error("RETRY PAYMENT ERROR:", err);
+    res.status(500).json({ message: "Retry failed" });
+  }
+};

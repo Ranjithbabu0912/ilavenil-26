@@ -13,4 +13,5 @@ router.post("/register", createRegistration);
 router.post("/check-status", checkPaymentStatus);
 
 router.get("/all-registration", getAllRegistration);
+
 export default router;

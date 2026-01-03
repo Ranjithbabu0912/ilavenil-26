@@ -20,7 +20,6 @@ app.options(/.*/, corsMiddleware);
 
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
 

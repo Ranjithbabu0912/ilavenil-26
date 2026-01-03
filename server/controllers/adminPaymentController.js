@@ -1,7 +1,6 @@
 import EventRegistration from "../models/eventRegistration.js";
 import crypto from "crypto";
-import cloudinary from "../config/cloudinary.js";
-import { sendPaymentConfirmationEmail } from "../utils/sendRegistrationEmail.js";
+import { sendPaymentConfirmationEmail, sendPaymentRejectionEmail } from "../utils/sendRegistrationEmail.js";
 import connectDB from "../config/db.js";
 
 
@@ -56,7 +55,7 @@ export const getPayments = async (req, res) => {
   try {
 
     await connectDB();
-    
+
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 5;
     const search = req.query.search?.trim();
@@ -123,7 +122,7 @@ export const approvePayment = async (req, res) => {
 
     await reg.save();
 
-    // ✉️ SEND CONFIRMATION EMAIL (NON-BLOCKING)
+    // ✉️ SEND CONFIRMATION EMAIL 
     try {
       await sendPaymentConfirmationEmail({
         to: reg.email,
@@ -149,23 +148,48 @@ export const approvePayment = async (req, res) => {
 
 
 
-
-
 export const rejectPayment = async (req, res) => {
-  const reg = await EventRegistration.findById(req.params.id);
+  try {
+    console.log("🧾 Reject body:", req.body);
 
-  if (!reg) {
-    return res.status(404).json({ message: "Not found" });
+    const { reason } = req.body;
+
+    if (!reason || reason.trim().length < 3) {
+      return res.status(400).json({
+        message: "Reject reason is required",
+      });
+    }
+
+    const registration = await EventRegistration.findById(req.params.id);
+
+    if (!registration) {
+      return res.status(404).json({ message: "Registration not found" });
+    }
+
+    registration.payment.status = "REJECTED";
+    registration.payment.rejectionReason = reason.trim();
+    registration.payment.rejectedAt = new Date();
+
+    await registration.save();
+
+    // 📧 rejection email (non-blocking)
+    try {
+      await sendPaymentRejectionEmail({
+        to: registration.email,
+        name: registration.name,
+        registrationId: registration._id,
+        rejectReason: reason.trim(),
+      });
+    } catch (emailErr) {
+      console.error("❌ Email failed:", emailErr.message);
+    }
+
+    res.json({
+      success: true,
+      message: "Payment rejected & rejection email sent",
+    });
+  } catch (err) {
+    console.error("REJECT ERROR:", err);
+    res.status(500).json({ message: "Reject failed" });
   }
-
-  if (reg.payment?.screenshotPublicId) {
-    await cloudinary.uploader.destroy(
-      reg.payment.screenshotPublicId
-    );
-  }
-
-  reg.payment.status = "REJECTED";
-  await reg.save();
-
-  res.json({ success: true });
 };
