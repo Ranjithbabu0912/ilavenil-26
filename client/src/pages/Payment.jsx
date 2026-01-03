@@ -69,10 +69,10 @@ const Payment = () => {
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="h-screen mt-20 flex items-center justify-center bg-gray-50 px-4">
             <form
                 onSubmit={handleSubmit}
-                className="bg-white shadow-xl rounded-xl p-8 max-w-md w-full"
+                className="bg-white shadow-xl rounded-xl p-8 max-w-sm md:max-w-lg w-full"
             >
                 <h2 className="text-2xl font-bold text-center mb-6">
                     Payment Details
@@ -85,26 +85,31 @@ const Payment = () => {
                         type="text"
                         value="UPI"
                         disabled
-                        className="w-full border p-2 rounded bg-gray-100 mt-1"
+                        className="w-full border p-2 rounded bg-gray-100 mt-1 cursor-no-drop"
                     />
                 </div>
 
                 {/* UPI Instructions */}
-                <div className="mb-4 text-sm bg-blue-50 p-3 rounded">
-                    <p className="font-semibold mb-1">Pay using UPI</p>
+                <div className="mb-4 flex flex-col md:flex-row gap-3 items-center text-sm bg-blue-50 p-3 rounded">
+                    <div >
+                        <p className="font-semibold mb-1">Pay using UPI</p>
+                        <img src="/paymentQR.png" alt="paymentQR" className="h-30" />
+                    </div>
+                    <div>
 
-                    <p className="flex items-center gap-1">
-                        UPI ID:
-                        <CopyText text="ilavenil26@upi" />
-                    </p>
+                        <p className="flex items-center gap-1">
+                            UPI ID:
+                        </p>
+                        <CopyText text="QR917010931030-1875@unionbankofindia" />
 
-                    <p>
-                        Amount: <b>₹200</b>
-                    </p>
+                        <p>
+                            Amount: <b>₹200</b>
+                        </p>
 
-                    <p className="text-xs text-gray-600 mt-1">
-                        After payment, enter UTR below
-                    </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                            After payment, enter UTR below and upload screenshot
+                        </p>
+                    </div>
                 </div>
 
                 {/* UTR */}

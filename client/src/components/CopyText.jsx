@@ -13,7 +13,7 @@ const CopyText = ({ text }) => {
 
   return (
     <span className="inline-flex items-center gap-2">
-      <span className="font-medium">{text}</span>
+      <span className="text-xs">{text}</span>
 
       <button
         type="button"
@@ -21,7 +21,7 @@ const CopyText = ({ text }) => {
         className="p-1 rounded hover:bg-gray-100"
         aria-label="Copy"
       >
-        <Copy size={16} />
+        <Copy size={16} className="cursor-pointer"/>
       </button>
     </span>
   );

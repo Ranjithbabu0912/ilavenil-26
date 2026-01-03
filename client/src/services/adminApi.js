@@ -40,13 +40,28 @@ export const approvePayment = async (id, token) => {
     if (!res.ok) throw new Error("Approve failed");
 };
 
-export const rejectPayment = async (id, token) => {
-    const res = await fetch(`${API}/api/admin/payments/${id}/reject`, {
-        method: "PATCH",
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
 
-    if (!res.ok) throw new Error("Reject failed");
+export const rejectPayment = async (id, token, reason) => {
+    console.log("🚀 Sending reject request", { id, reason });
+
+    const res = await fetch(
+        `${API}/api/admin/payments/${id}/reject`,
+        {
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ reason }),
+        }
+    );
+
+    const data = await res.json();
+    console.log("📥 Reject response:", data);
+
+    if (!res.ok) {
+        throw new Error(data.message || "Reject failed");
+    }
+
+    return data;
 };

@@ -12,7 +12,8 @@ const Success = () => {
 
     const handleAction = () => {
         if (isPayment) {
-            navigate("/"); // 🏠 Go Home
+            navigate("/", { replace: true });
+            window.location.reload(); // 🔄 reload page
         } else {
             if (!registrationId) {
                 alert("Registration ID missing");
@@ -22,8 +23,9 @@ const Success = () => {
         }
     };
 
-    const SUPPORT_EMAIL = "help.ilavenil26@gmail.com"; 
-    const SUPPORT_WHATSAPP = "919043100583"; 
+
+    const SUPPORT_EMAIL = "help.ilavenil26@gmail.com";
+    const SUPPORT_WHATSAPP = "919043100583";
 
 
     return (

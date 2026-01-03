@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from "react-toastify";
 import { useUser } from "@clerk/clerk-react";
 
-
 const eventsList = [
     { name: "CorpIQ", type: "2" },
     { name: "Market Mania", type: "2" },
@@ -14,41 +13,146 @@ const eventsList = [
     { name: "Mind Maze", type: "1" },
     { name: "Up2date", type: "1" },
     { name: "Yourspark", type: "max 5" },
-]
+];
+
+// group events (participants > 1)
+const groupEvents = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Yourspark"];
 
 const RegistrationForm = () => {
 
     const [loading, setLoading] = useState(false);
-
     const { user, isLoaded, isSignedIn } = useUser();
-
-    const loggedInEmail = user?.primaryEmailAddress?.emailAddress;
-
     const navigate = useNavigate();
 
-    const [selectedEvents, setSelectedEvents] = useState([])
+    const isMobile = window.innerWidth <= 768;
 
-    const handleEventChange = (eventName) => {
-        if (selectedEvents.includes(eventName)) {
-            // remove event
-            setSelectedEvents(selectedEvents.filter(e => e !== eventName))
-        } else {
-            // add event only if less than 2
-            if (selectedEvents.length < 2) {
-                setSelectedEvents([...selectedEvents, eventName])
-            } else {
-                alert("You can select only 2 events")
-            }
-        }
-    }
+    const loggedInEmail = user?.primaryEmailAddress?.emailAddress;
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    const [selectedEvents, setSelectedEvents] = useState([]);
+
+    const isGroupEventSelected = selectedEvents.some(e =>
+        groupEvents.includes(e)
+    );
+
+    const genderOptions = ["Male", "Female", "Other"];
+
+    const departmentOptions = [
+        "BA (General)",
+        "BA English",
+        "BA Economics",
+        "BA History",
+        "BA Political Science",
+        "BA Psychology",
+        "BFA (Fine Arts)",
+        "Journalism & Mass Communication",
+        "BSc (General)",
+        "BSc Mathematics",
+        "BSc Physics",
+        "BSc Chemistry",
+        "BSc Computer Science",
+        "BSc Information Technology",
+        "BSc Biotechnology",
+        "BSc Data Science / AI",
+        "BCom (General)",
+        "BCom Accounting & Finance",
+        "BCom Computer Applications",
+        "BBA",
+        "BMS / BBM",
+        "Hotel Management",
+        "BE / BTech (All branches)",
+        "BTech Computer Science / IT",
+        "BTech AI & Data Science",
+        "BTech Mechanical",
+        "BTech Civil",
+        "BTech ECE / EEE",
+        "MBBS",
+        "BDS",
+        "BSc Nursing",
+        "BPharm",
+        "Physiotherapy (BPT)",
+        "Allied Health Sciences",
+        "BCA",
+        "BSc Computer Applications",
+        "BA LLB",
+        "BBA LLB",
+        "LLB",
+        "BEd",
+        "Agriculture (BSc)",
+        "Design / Fashion",
+        "Social Work (BSW)",
+        "Other",
+    ];
+
+
+    const cityOptions = [
+        "Ariyalur",
+        "Chengalpattu",
+        "Chennai",
+        "Coimbatore",
+        "Cuddalore",
+        "Dharmapuri",
+        "Dindigul",
+        "Erode",
+        "Kallakurichi",
+        "Kancheepuram",
+        "Karur",
+        "Krishnagiri",
+        "Madurai",
+        "Mayiladuthurai",
+        "Nagapattinam",
+        "Namakkal",
+        "Nilgiris",
+        "Perambalur",
+        "Pudukkottai",
+        "Ramanathapuram",
+        "Ranipet",
+        "Salem",
+        "Sivaganga",
+        "Tenkasi",
+        "Thanjavur",
+        "Theni",
+        "Thoothukudi",
+        "Tiruchirappalli",
+        "Tirunelveli",
+        "Tirupathur",
+        "Tiruppur",
+        "Tiruvallur",
+        "Tiruvannamalai",
+        "Tiruvarur",
+        "Vellore",
+        "Viluppuram",
+        "Virudhunagar",
+        "Other",
+    ];
+
+
 
     const [formData, setFormData] = useState({
         name: "",
         contact: "",
         collegeName: "",
         discipline: "",
+        disciplineOther: "",
+        collegeCity: "",
+        collegeCityOther: "",
         year: "",
+        teamName: "",
     });
+
+
+
+    const handleEventChange = (eventName) => {
+        if (selectedEvents.includes(eventName)) {
+            setSelectedEvents(selectedEvents.filter(e => e !== eventName));
+        } else {
+            if (selectedEvents.length < 2) {
+                setSelectedEvents([...selectedEvents, eventName]);
+            } else {
+                toast.error("You can select only 2 events");
+            }
+        }
+    };
 
     const handleChange = (e) => {
         setFormData({
@@ -56,7 +160,6 @@ const RegistrationForm = () => {
             [e.target.name]: e.target.value,
         });
     };
-    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -73,15 +176,36 @@ const RegistrationForm = () => {
             return;
         }
 
+        if (isGroupEventSelected && !formData.teamName.trim()) {
+            toast.error("Team name is required for group events");
+            return;
+        }
+
         const payload = {
             ...formData,
-            email: loggedInEmail, // ✅ FROM LOGIN
+            email: loggedInEmail,
             contact: Number(formData.contact),
+
+            // ✅ map "Other" → custom input
+            discipline:
+                formData.discipline === "Other"
+                    ? formData.disciplineOther
+                    : formData.discipline,
+
+            collegeCity:
+                formData.collegeCity === "Other"
+                    ? formData.collegeCityOther
+                    : formData.collegeCity,
+
+
             events: {
                 primary: selectedEvents[0],
                 secondary: selectedEvents[1] || null,
             },
+
+            teamName: isGroupEventSelected ? formData.teamName : null,
         };
+
 
         try {
             setLoading(true);
@@ -95,29 +219,22 @@ const RegistrationForm = () => {
             const data = await res.json();
 
             if (data.success) {
-                const registrationId = data.registrationId;
-
-                localStorage.setItem("registeredEmail", loggedInEmail);
-                navigate(`/success?page=register&rid=${registrationId}`);
-                // navigate('/success')
+                navigate(`/success?page=register&rid=${data.registrationId}`);
             } else {
                 toast.error(data.message);
             }
-        } catch (error) {
+        } catch {
             toast.error("Server error. Try again later");
         } finally {
             setLoading(false);
         }
     };
 
-
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
-
 
     useEffect(() => {
         if (!isLoaded) return;
 
-        // 🔐 Not logged in → Sign in
         if (!isSignedIn) {
             navigate("/sign-in");
             return;
@@ -127,18 +244,14 @@ const RegistrationForm = () => {
             try {
                 const res = await fetch(`${API_URL}/api/events/check-status`, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: userEmail }),
                 });
 
-                // If backend itself is down → real error
                 if (!res.ok) return;
 
                 const data = await res.json();
 
-                // ✅ ONLY act if already registered
                 if (data.success) {
                     toast.info("You are already registered");
 
@@ -148,135 +261,206 @@ const RegistrationForm = () => {
                         navigate("/");
                     }
                 }
-                
-            } catch (err) {
+            } catch {
                 console.warn("Registration check skipped");
             }
         };
-
 
         checkRegistration();
     }, [isLoaded, isSignedIn, userEmail, navigate]);
 
 
-
+    const isOtherInvalid =
+        (formData.discipline === "Other" && !formData.disciplineOther.trim()) ||
+        (formData.collegeCity === "Other" && !formData.collegeCityOther.trim());
 
 
     return (
-        <div className='my-30'>
+        <div className="my-30">
             <form
                 onSubmit={handleSubmit}
-                className="flex flex-col gap-3 p-10 shadow-2xl rounded-2xl border-2 border-gray-200 max-w-lg mx-auto mt-10">
+                className="flex flex-col gap-3 p-10 shadow-2xl rounded-2xl border-2 border-gray-200 max-w-lg mx-auto mt-10"
+            >
+                <ArrowLeft className="cursor-pointer" onClick={() => navigate('/')} />
 
-                <ArrowLeft className='cursor-pointer' onClick={() => navigate('/')}></ArrowLeft>
-                <h1 className='text-2xl text-center font-bold underline'>Registration Form</h1>
+                <h1 className="text-2xl text-center font-bold underline">
+                    Registration Form
+                </h1>
 
-                <label className='font-semibold text-lg'>Name</label>
-                <input
-                    type="text"
-                    name="name"
-                    className="border p-2 rounded"
+                {/* Name */}
+                <label className="font-semibold text-lg">Name</label>
+                <input type="text" name="name" required className="border p-2 rounded" onChange={handleChange} />
+
+                {/* Gender */}
+                <label className="font-semibold text-lg">Gender</label>
+                <select
+                    name="gender"
                     required
-                    onChange={handleChange}
-                />
-
-                <label className='font-semibold text-lg'>Contact</label>
-                <input
-                    type="tel"
-                    name="contact"
                     className="border p-2 rounded"
-                    required
+                    value={formData.gender}
                     onChange={handleChange}
-                />
+                >
+                    <option value="">Select Gender</option>
+                    {genderOptions.map(g => (
+                        <option key={g} value={g}>{g}</option>
+                    ))}
+                </select>
 
 
-                <label className='font-semibold text-lg'>Email</label>
+                {/* Contact */}
+                <label className="font-semibold text-lg">Contact</label>
+                <input type="tel" name="contact" required className="border p-2 rounded" onChange={handleChange} />
+
+                {/* Email */}
+                <label className="font-semibold text-lg">Email</label>
                 <input
                     type="email"
-                    name="email"
                     value={loggedInEmail || ""}
-                    className="border p-2 rounded bg-gray-100 text-gray-500 cursor-not-allowed"
                     disabled
-                    onChange={handleChange}
+                    className="border p-2 rounded bg-gray-100 text-gray-500 cursor-not-allowed"
                 />
 
 
-                <label className='font-semibold text-lg'>College Name</label>
-                <input
-                    type="text"
-                    name="collegeName"
-                    className="border p-2 rounded"
-                    required
-                    onChange={handleChange}
-                />
-
-
-                <label className='font-semibold text-lg'>Discipline</label>
-                <input
-                    type="text"
+                {/* Department */}
+                <label className="font-semibold text-lg">Department / Course</label>
+                <select
                     name="discipline"
-                    className="border p-2 rounded"
                     required
+                    className="border p-2 rounded"
+                    value={formData.discipline}
                     onChange={handleChange}
-                />
+                >
+                    <option value="">Select Department / Course</option>
+                    {departmentOptions.map(dep => (
+                        <option key={dep} value={dep}>{dep}</option>
+                    ))}
+                </select>
+
+                {formData.discipline === "Other" && !formData.disciplineOther.trim() && (
+                    <p className="text-xs text-red-500">
+                        Please specify your department / course
+                    </p>
+                )}
 
 
-                {/* Year of Study */}
-                <div>
-                    <label className="font-semibold text-lg">Year of Study</label>
-                    <div className="flex gap-6 mt-1">
-                        {["I", "II", "III", "IV"].map(y => (
-                            <label key={y} className="flex items-center gap-1">
-                                <input
-                                    type="radio"
-                                    name="year"
-                                    value={y}
-                                    onChange={handleChange}
-                                /> {y}
-                            </label>
-                        ))}
-                    </div>
+
+
+                {/* Auto show when Other */}
+                {formData.discipline === "Other" && (
+                    <input
+                        type="text"
+                        name="disciplineOther"
+                        placeholder="Enter Department / Course"
+                        required
+                        className="border p-2 rounded mt-2"
+                        value={formData.disciplineOther}
+                        onChange={handleChange}
+                    />
+                )}
+
+
+
+                {/* College */}
+                <label className="font-semibold text-lg">College Name</label>
+                <input type="text" name="collegeName" required className="border p-2 rounded" onChange={handleChange} />
+
+
+
+                {/* City */}
+                <label className="font-semibold text-lg">College City / District</label>
+                <select
+                    name="collegeCity"
+                    required
+                    className="border p-2 rounded"
+                    value={formData.collegeCity}
+                    onChange={handleChange}
+                >
+                    <option value="">Select City / District</option>
+                    {cityOptions.map(city => (
+                        <option key={city} value={city}>{city}</option>
+                    ))}
+                </select>
+                {formData.collegeCity === "Other" && !formData.collegeCityOther.trim() && (
+                    <p className="text-xs text-red-500">
+                        Please specify your city / district
+                    </p>
+                )}
+
+                {/* Auto show when Other */}
+                {formData.collegeCity === "Other" && (
+                    <input
+                        type="text"
+                        name="collegeCityOther"
+                        placeholder="Enter City / District"
+                        required
+                        className="border p-2 rounded mt-2"
+                        value={formData.collegeCityOther}
+                        onChange={handleChange}
+                    />
+                )}
+
+
+
+                {/* Year */}
+                <label className="font-semibold text-lg">Year of Study</label>
+                <div className="flex gap-6">
+                    {["I", "II", "III", "IV"].map(y => (
+                        <label key={y} className="flex items-center gap-1">
+                            <input type="radio" name="year" value={y} required onChange={handleChange} />
+                            {y}
+                        </label>
+                    ))}
                 </div>
 
                 {/* Events */}
-                <div>
-                    <label className="font-semibold text-lg">Participating Events <small className='text-xs font-normal text-gray-500 ml-1'>(No.of Participants)</small></label>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                        {eventsList.map((event) => {
-                            const isChecked = selectedEvents.includes(event.name)
-                            const isDisabled =
-                                selectedEvents.length === 2 && !isChecked
+                <label className="font-semibold text-lg">
+                    Participating Events <span className="text-xs text-gray-500">(Max 2)</span>
+                </label>
 
-                            return (
-                                <label
-                                    key={event.name}
-                                    className={`flex items-center gap-2 ${isDisabled ? "opacity-50 cursor-not-allowed" : ""
-                                        }`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={isChecked}
-                                        disabled={isDisabled}
-                                        onChange={() => handleEventChange(event.name)}
-                                    />
-                                    <span>
-                                        {event.name}
-                                        <span className="text-xs text-gray-500 ml-1">
-                                            ({event.type})
-                                        </span>
-                                    </span>
-                                </label>
-                            )
-                        })}
-                    </div>
+                <div className="grid grid-cols-2 gap-2">
+                    {eventsList.map(event => {
+                        const isChecked = selectedEvents.includes(event.name);
+                        const isDisabled = selectedEvents.length === 2 && !isChecked;
+
+                        return (
+                            <label key={event.name} className={`flex items-center gap-2 ${isDisabled && "opacity-50"}`}>
+                                <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    disabled={isDisabled}
+                                    onChange={() => handleEventChange(event.name)}
+                                />
+                                {event.name} <span className="text-xs text-gray-500">({event.type})</span>
+                            </label>
+                        );
+                    })}
                 </div>
 
+                {/* Team Name */}
+                {isGroupEventSelected && (
+                    <>
+                        <label className="font-semibold text-lg">
+                            Team Name <span className="text-xs text-gray-500">(Group events only)</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="teamName"
+                            required
+                            className="border p-2 rounded"
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs -mt-2 text-gray-500">
+                            Kindly enter the same team name for all team members
+                        </p>
+                    </>
+                )}
 
-                <p className='text-xs text-gray-500 py-3'>
-                    * Before submit, please re-check details
-                </p>
 
-                <div className='grid grid-cols-2 gap-6'>
+
+
+
+
+                <div className="grid grid-cols-2 gap-6 mt-4">
                     <button
                         type="reset"
                         className="border-2 border-red-600 hover:bg-red-600 hover:text-white py-2 rounded"
@@ -287,19 +471,18 @@ const RegistrationForm = () => {
 
                     <button
                         type="submit"
-                        disabled={loading}
-                        className={`${loading
+                        disabled={loading || isOtherInvalid}
+                        className={`text-white py-2 rounded ${loading || isOtherInvalid
                             ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-800"
-                            } text-white py-2 rounded`}
+                            : "bg-blue-600 hover:bg-blue-800"}
+                            `}
                     >
                         {loading ? "Loading..." : "Register"}
                     </button>
                 </div>
-
             </form>
         </div>
-    )
-}
+    );
+};
 
-export default RegistrationForm
+export default RegistrationForm;

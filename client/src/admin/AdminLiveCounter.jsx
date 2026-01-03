@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-    LineChart,
-    Line,
+    BarChart,
+    Bar,
     XAxis,
     YAxis,
     Tooltip,
@@ -11,37 +11,51 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const AdminLiveCounter = () => {
+const AdminDailyDashboard = () => {
     const [stats, setStats] = useState(null);
-    const [history, setHistory] = useState([]);
-
-    const fetchStats = async () => {
-        const res = await fetch(`${API_URL}/api/admin/registration-stats`);
-        const data = await res.json();
-
-        setStats(data);
-
-        // 📈 push data point for graph
-        setHistory(prev => [
-            ...prev.slice(-20), // keep last 20 points
-            {
-                time: new Date().toLocaleTimeString(),
-                registrations: data.totalRegistrations,
-            },
-        ]);
-    };
+    const [dailyData, setDailyData] = useState([]);
 
     useEffect(() => {
         fetchStats();
-        const interval = setInterval(fetchStats, 5000); // every 5 sec
-        return () => clearInterval(interval);
+        fetchDailyStats();
     }, []);
 
-    if (!stats) return <p className="text-center mt-10">Loading dashboard...</p>;
+    const fetchStats = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/admin/registration-stats`);
+            const data = await res.json();
+            setStats(data);
+        } catch (err) {
+            console.error("Failed to fetch stats");
+        }
+    };
+
+    const fetchDailyStats = async () => {
+        try {
+            const res = await fetch(
+                `${API_URL}/api/admin/daily-registration-stats`
+            );
+            const json = await res.json();
+
+            if (json.success) {
+                setDailyData(json.stats);
+            }
+        } catch (err) {
+            console.error("Failed to fetch daily stats");
+        }
+    };
+
+    if (!stats) {
+        return (
+            <p className="text-center mt-10 text-gray-500">
+                Loading dashboard...
+            </p>
+        );
+    }
 
     return (
-        <div className="max-w-4xl mx-auto mt-24 p-6 space-y-8">
-            {/* 🔢 COUNTER */}
+        <div className="max-w-5xl mx-auto md:mt-24 p-6 space-y-10">
+            {/* 🔢 COUNTERS */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <StatBox label="Total Registered" value={stats.totalRegistrations} />
                 <StatBox label="Limit" value={stats.limit} />
@@ -53,25 +67,20 @@ const AdminLiveCounter = () => {
                 />
             </div>
 
-            {/* 📈 GRAPH */}
+            {/* 📊 DAILY BAR CHART */}
             <div className="bg-white p-4 rounded-xl shadow">
                 <h3 className="text-lg font-bold mb-3 text-center">
-                    📈 Live Registration Trend
+                    Daily Registrations (01 Jan – 20 Jan 2026)
                 </h3>
 
-                <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={history}>
+                <ResponsiveContainer width="100%" height={320}>
+                    <BarChart data={dailyData}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" />
+                        <XAxis dataKey="date" />
                         <YAxis allowDecimals={false} />
                         <Tooltip />
-                        <Line
-                            type="monotone"
-                            dataKey="registrations"
-                            strokeWidth={3}
-                            dot={false}
-                        />
-                    </LineChart>
+                        <Bar dataKey="registrations" />
+                    </BarChart>
                 </ResponsiveContainer>
             </div>
         </div>
@@ -85,4 +94,4 @@ const StatBox = ({ label, value, color = "text-black" }) => (
     </div>
 );
 
-export default AdminLiveCounter;
+export default AdminDailyDashboard;

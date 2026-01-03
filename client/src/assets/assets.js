@@ -30,8 +30,8 @@ export const eventDetails = [
                 contact: "918220672352"
             },
             {
-                name: "name 2",
-                contact: "918220672352"
+                name: "Jeevalakshmi DV",
+                contact: "919384489214"
             }
         ]
     },

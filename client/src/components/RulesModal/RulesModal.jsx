@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { RULES } from "../../data/rules";
+import { RULES } from "../../assets/rules.js";
 
 const RULES_PER_STEP = 2;
 

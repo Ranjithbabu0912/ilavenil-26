@@ -147,7 +147,7 @@ const MyQR = () => {
                 link.click();
             };
 
-            logoImg.src = "/event-logo.png";
+            logoImg.src = "/email-logo.png";
         };
 
         qrImg.src =
@@ -159,7 +159,7 @@ const MyQR = () => {
 
 
     return (
-        <div className="flex flex-col min-h-screen justify-center items-center gap-4">
+        <div className="flex flex-col mt-30 justify-center items-center gap-4">
             <h1 className="text-xl logo-text">ILAVENIL'26</h1>
 
             <div ref={qrRef} className="bg-white p-4 rounded shadow">

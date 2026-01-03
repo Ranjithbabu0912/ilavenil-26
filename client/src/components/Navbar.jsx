@@ -85,10 +85,7 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
         ) return;
 
 
-        if (
-            paymentStatus === "NOT_PAID" ||
-            paymentStatus === "REJECTED"
-        ) {
+        if (paymentStatus === "NOT_PAID") {
             setHandled(true);
             navigate(`/payment/${registrationId}`);
             return;
@@ -96,7 +93,8 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
 
         if (
             paymentStatus === "PENDING" ||
-            paymentStatus === "APPROVED"
+            paymentStatus === "APPROVED" ||
+            paymentStatus === "REJECTED"
         ) {
             setHandled(true);
             onOpenStatus();
@@ -173,7 +171,7 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
                     {!isSignedIn && (
                         <button
                             onClick={openSignIn}
-                            className="px-4 py-2 rounded-lg bg-primary text-white flex items-center gap-2"
+                            className="px-4 py-2 rounded-lg cursor-pointer bg-primary text-white flex items-center gap-2"
                         >
                             Sign In <ArrowRight className="h-4" />
                         </button>
@@ -182,17 +180,17 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
                     {isSignedIn && !registered && !isAdmin && (
                         <button
                             onClick={handleRegister}
-                            className="px-4 py-2 rounded-lg bg-primary text-white flex items-center gap-2"
+                            className="px-4 py-2 rounded-lg cursor-pointer bg-primary text-white flex items-center gap-2"
                         >
                             Register Now <ArrowRight className="h-4" />
                         </button>
                     )}
 
                     {isSignedIn && registered && !isAdmin &&
-                        (paymentStatus === "NOT_PAID" || paymentStatus === "REJECTED") && (
+                        (paymentStatus === "NOT_PAID") && (
                             <button
                                 onClick={handlePayment}
-                                className="px-4 py-2 rounded-lg bg-primary text-white"
+                                className="px-4 py-2 rounded-lg cursor-pointer bg-primary text-white"
                             >
                                 Proceed to Payment
                             </button>
@@ -200,10 +198,10 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
                     }
 
                     {isSignedIn && registered && !isAdmin &&
-                        (paymentStatus === "PENDING" || paymentStatus === "APPROVED") && (
+                        (paymentStatus === "PENDING" || paymentStatus === "APPROVED" || paymentStatus === "REJECTED") && (
                             <button
                                 onClick={onOpenStatus}
-                                className="px-4 py-2 rounded-lg bg-primary text-white"
+                                className="px-4 py-2 rounded-lg cursor-pointer bg-primary text-white"
                             >
                                 Check Status
                             </button>
@@ -248,7 +246,7 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
                     {!isSignedIn && (
                         <button
                             onClick={openSignIn}
-                            className="w-full py-2 rounded-lg bg-primary text-white"
+                            className="w-full py-2 cursor-pointer rounded-lg bg-primary text-white"
                         >
                             Sign In
                         </button>
@@ -257,17 +255,17 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
                     {isSignedIn && !registered && !isAdmin && (
                         <button
                             onClick={handleRegister}
-                            className="w-full py-2 rounded-lg bg-primary text-white"
+                            className="w-full py-2 cursor-pointer rounded-lg bg-primary text-white"
                         >
                             Register Now
                         </button>
                     )}
 
                     {isSignedIn && registered && !isAdmin &&
-                        (paymentStatus === "NOT_PAID" || paymentStatus === "REJECTED") && (
+                        (paymentStatus === "NOT_PAID") && (
                             <button
                                 onClick={handlePayment}
-                                className="w-full py-2 rounded-lg bg-primary text-white"
+                                className="w-full py-2 cursor-pointer rounded-lg bg-primary text-white"
                             >
                                 Proceed to Payment
                             </button>
@@ -275,10 +273,10 @@ const Navbar = ({ onOpenStatus = () => { } }) => {
                     }
 
                     {isSignedIn && registered && !isAdmin &&
-                        (paymentStatus === "PENDING" || paymentStatus === "APPROVED") && (
+                        (paymentStatus === "PENDING" || paymentStatus === "APPROVED" || paymentStatus === "REJECTED") && (
                             <button
                                 onClick={onOpenStatus}
-                                className="w-full py-2 rounded-lg bg-primary text-white"
+                                className="w-full py-2 cursor-pointer rounded-lg bg-primary text-white"
                             >
                                 Check Status
                             </button>

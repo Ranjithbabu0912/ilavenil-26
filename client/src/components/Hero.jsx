@@ -126,24 +126,30 @@ const Hero = () => {
 
     return (
         <div>
+            <img src="/gradientBackground.png" alt="" className='bg-cover bg-no-repeat min-h-screen w-full absolute' />
+
             <div className='px-4 sm:px-20 xl:px-32 relative inline-flex items-center justify-center w-full bg-[url(/gradientBackground.png)] bg-cover bg-no-repeat min-h-screen'>
 
 
+
                 {/* TEXT CONTENT */}
-                <div className='flex flex-col mt-10'>
+                <div className='flex flex-col items-center'>
+
+                    {/* <div className='absolute left-10 top-30 flex items-center gap-3'>
+                        <img src="/GTN-logo.png" alt="" className='w-10 md:w-20 ' />
+                        <img src="/MBA-logo.png" alt="" className='w-10 md:w-20 rounded-full' />
+                        <img src="/MCA-logo.png" alt="" className='w-10 md:w-20 rounded-full ' />
+                    </div> */}
 
                     {/* ⏳ REGISTRATION COUNTDOWN */}
                     <Countdown timeLeft={timeLeft} />
 
-
-
-
                     <div className='text-center mb-6 gap-3  text-gray-800'>
                         <h1 className='logo-text text-5xl md:text-6xl xl:text-8xl mx-auto leading-[1.2]'>ILAVENIL'26</h1>
                         <p className='text-sm md:text-lg'>A season of young talent</p>
-                        <p className='text-xl md:text-3xl'>An Intercollegiate Meet</p>
+                        <p className='text-xl md:text-3xl'>An Intercollegiate Fest</p>
                         <p className='text-sm md:text-lg'>Organized by</p>
-                        <h1 className='text-xl md:text-3xl'>Departments of <span className='font-semibold'>MBA & MCA</span></h1>
+                        <h1 className='text-xl md:text-3xl mb-2'>Departments of <span className='font-semibold'>MBA & MCA</span></h1>
                         <h1 className='text-sm md:text-xl '>G.T.N. ARTS COLLEGE (Autonomous), Dindigul.</h1>
 
 
@@ -200,7 +206,7 @@ const Hero = () => {
                             )}
                             className='px-5 py-3 text-xs md:text-sm rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer flex items-center gap-2 border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-white hover:shadow-2xl'
                         >
-                             <MessageCircle /> Whatsapp
+                            <MessageCircle /> Whatsapp
                         </button>
 
 

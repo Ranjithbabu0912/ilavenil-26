@@ -6,11 +6,11 @@ const StyledQR = ({ data }) => {
 
     useEffect(() => {
         const qr = new QRCodeStyling({
-            width: 280,
-            height: 280,
+            width: 320,
+            height: 320,
             type: "svg",
             data,
-            image: "/event-logo.png", // center logo
+            image: "/email-logo.png", // center logo
             dotsOptions: {
                 color: "#1e40af", // event blue
                 type: "dots",
@@ -28,7 +28,7 @@ const StyledQR = ({ data }) => {
             },
             imageOptions: {
                 crossOrigin: "anonymous",
-                margin: 6,
+                margin: 1,
             },
             qrOptions: {
                 errorCorrectionLevel: "H",

@@ -46,7 +46,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className='flex flex-col gap-3 lg:ml-10'>
+                <div className='flex flex-col gap-3'>
                     <div className='flex items-center gap-3'>
                         <a href="https://www.linkedin.com/in/ranjithbabu0912" target='_blank'>
                             <p className='bg-primary h-10 w-10 rounded-full text-white flex items-center justify-center'><LucideLinkedin className='' /></p>
