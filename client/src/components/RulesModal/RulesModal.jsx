@@ -80,18 +80,6 @@ const RulesModal = ({ onClose }) => {
     }
   }, [step, lang]);
 
-  /* Navigation */
-  const nextStep = () => {
-    if (step + 1 >= totalSteps) {
-      closePopup();
-    } else {
-      setStep(s => s + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (step > 0) setStep(s => s - 1);
-  };
 
   /* Swipe */
   let touchStartX = 0;
@@ -115,13 +103,88 @@ const RulesModal = ({ onClose }) => {
 
   /* LISTEN */
   const listenNow = () => {
+    speechSynthesis.cancel();
     setMuted(false);
+    setIsSpeaking(false);
+
+    setTimeout(() => {
+      speakCurrentStep();
+    }, 100);
+  };
+
+
+  // SPEAK CURRENT STEP
+  const speakCurrentStep = () => {
+    if (muted) return;
+
     const text = RULES
       .slice(step * RULES_PER_STEP, step * RULES_PER_STEP + RULES_PER_STEP)
       .map(r => r[lang])
       .join(". ");
+
     speak(text);
   };
+
+
+  /* Navigation */
+  const nextStep = () => {
+    speechSynthesis.cancel();
+    setIsSpeaking(false);
+
+    if (step + 1 >= totalSteps) {
+      closePopup();
+    } else {
+      setStep(s => {
+        const newStep = s + 1;
+
+        // ⏳ wait for UI update then speak
+        setTimeout(() => {
+          if (!muted) {
+            const text = RULES
+              .slice(
+                newStep * RULES_PER_STEP,
+                newStep * RULES_PER_STEP + RULES_PER_STEP
+              )
+              .map(r => r[lang])
+              .join(". ");
+
+            speak(text);
+          }
+        }, 150);
+
+        return newStep;
+      });
+    }
+  };
+
+
+  const prevStep = () => {
+    if (step === 0) return;
+
+    speechSynthesis.cancel();
+    setIsSpeaking(false);
+
+    setStep(s => {
+      const newStep = s - 1;
+
+      setTimeout(() => {
+        if (!muted) {
+          const text = RULES
+            .slice(
+              newStep * RULES_PER_STEP,
+              newStep * RULES_PER_STEP + RULES_PER_STEP
+            )
+            .map(r => r[lang])
+            .join(". ");
+
+          speak(text);
+        }
+      }, 150);
+
+      return newStep;
+    });
+  };
+
 
   const closePopup = () => {
     if (dontShowAgain) {
