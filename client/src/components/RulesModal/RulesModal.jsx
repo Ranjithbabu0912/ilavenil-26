@@ -73,18 +73,6 @@ const RulesModal = ({ onClose }) => {
     speechSynthesis.speak(msg);
   };
 
-  /* 🔊 AUTO TTS */
-  useEffect(() => {
-    if (muted) return;
-
-    const text = RULES
-      .slice(step * RULES_PER_STEP, step * RULES_PER_STEP + RULES_PER_STEP)
-      .map(r => r[lang])
-      .join(". ");
-
-    speak(text);
-  }, [step, lang]);
-
   /* 📐 Auto height */
   useEffect(() => {
     if (contentRef.current) {
@@ -202,18 +190,16 @@ const RulesModal = ({ onClose }) => {
           <button
             onClick={listenNow}
             disabled={disableTamilTTS}
-            className={`flex-1 py-2 rounded-md text-white ${
-              disableTamilTTS ? "bg-gray-400" : "bg-blue-600"
-            }`}
+            className={`flex-1 py-2 rounded-md text-white ${disableTamilTTS ? "bg-gray-400" : "bg-blue-600"
+              }`}
           >
             🔊 Listen
           </button>
 
           <button
             onClick={muteAudio}
-            className={`px-4 py-2 rounded-md ${
-              muted ? "bg-red-500 text-white" : "bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded-md ${muted ? "bg-red-500 text-white" : "bg-gray-200"
+              }`}
           >
             🔇 Mute
           </button>
@@ -240,9 +226,8 @@ const RulesModal = ({ onClose }) => {
           {Array.from({ length: totalSteps }).map((_, i) => (
             <span
               key={i}
-              className={`w-2.5 h-2.5 rounded-full ${
-                i === step ? "bg-blue-600" : "bg-gray-300"
-              }`}
+              className={`w-2.5 h-2.5 rounded-full ${i === step ? "bg-blue-600" : "bg-gray-300"
+                }`}
             />
           ))}
         </div>
