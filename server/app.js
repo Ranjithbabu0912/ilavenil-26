@@ -7,6 +7,7 @@ import qrAttendanceRoutes from './routes/qrAttendanceRoutes.js';
 import userRoutes from "./routes/userRoutes.js";
 import adminAttendanceRoutes from "./routes/adminAttendanceRoutes.js";
 import adminStatsRoutes from "./routes/adminStatsRoutes.js";
+import contactRoutes from './routes/contactRoutes.js';
 import { fileURLToPath } from "url";
 import path from "path";
 
@@ -36,6 +37,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminPaymentRoutes);
 app.use("/api", userRoutes);
+app.use("/api", contactRoutes);
 app.use("/api/admin", adminAttendanceRoutes);
 
 

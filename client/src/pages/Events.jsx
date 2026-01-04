@@ -9,9 +9,9 @@ const Events = () => {
 
 
     return (
-        <div className='mt-30'>
-            <h1 className='text-3xl font-bold text-center text-primary'>Events</h1>
-            <div className="flex flex-wrap gap-10 md:p-20 p-10 items-center justify-center mb-10">
+        <div className='max-w-6xl mx-auto px-4 pt-36 pb-20'>
+            <h1 className='text-4xl font-bold text-center text-primary'>Events</h1>
+            <div className="flex flex-wrap gap-10 p-10 items-center justify-center mb-10">
                 {eventDetails.map((event, index) => (
                     <div key={index} onClick={() => navigate(`/events/${event.id}`)}>
                         <EventCard event={event} />

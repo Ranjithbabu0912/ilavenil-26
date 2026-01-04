@@ -93,12 +93,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "919087654321"
+                name: "Jerin A",
+                contact: "917010570288"
             },
             {
-                name: "name2",
-                contact: "919087654321"
+                name: "Narmatha Devi S",
+                contact: "919345032701"
             }
         ]
     },
@@ -127,12 +127,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "919087654321"
+                name: "Amala Wilson J",
+                contact: "918760071661"
             },
             {
-                name: "name2",
-                contact: "919087654321"
+                name: "Christina Shalini D",
+                contact: "918248471200"
             }
         ]
     },
@@ -192,12 +192,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "919087654321"
+                name: "Keerthana Rani S",
+                contact: "919790770953"
             },
             {
-                name: "name2",
-                contact: "919087654321"
+                name: "Leena Devi G S",
+                contact: "919994459804"
             }
         ]
     },
@@ -261,12 +261,12 @@ export const eventDetails = [
         ],
         coOrdinators: [
             {
-                name: "name1",
-                contact: "+919087654321"
+                name: "Jeeva S",
+                contact: "916381941218"
             },
             {
-                name: "name2",
-                contact: "919087654321"
+                name: "Praveen G",
+                contact: "918508347677"
             },
         ]
     },
@@ -336,3 +336,27 @@ export const paymentRule = [
         desc: "After verification, download your QR code for event attendance."
     }
 ];
+
+
+export const contactInfo = [
+    {
+        title: "Ranjith Babu S",
+        name: "Student Coordinator",
+        phone: "919043100583"
+    },
+    {
+        title: "Deepak Kumar S",
+        name: "Student Coordinator",
+        phone: "917845541693"
+    },
+    {
+        title: "Jaishreetha S",
+        name: "Student Coordinator",
+        phone: "916383849405"
+    },
+    {
+        title: "Bhuvaneswaran N",
+        name: "Student Coordinator",
+        phone: "916382751329"
+    },
+]

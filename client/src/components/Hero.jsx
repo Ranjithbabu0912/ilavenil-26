@@ -93,7 +93,7 @@ const Hero = () => {
 
 
 
-    const REGISTRATION_DEADLINE = new Date("2026-01-20T23:59:59");
+    const REGISTRATION_DEADLINE = new Date("2026-01-22T23:59:59");
 
     const calculateTimeLeft = () => {
         const now = new Date();
