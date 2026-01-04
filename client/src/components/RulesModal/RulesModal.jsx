@@ -25,13 +25,18 @@ const loadVoices = () =>
     }
   });
 
+
+
+
 const RulesModal = ({ onClose }) => {
   const [step, setStep] = useState(0);
   const [lang, setLang] = useState("en");
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [spokenIndex, setSpokenIndex] = useState(null);
 
   const [muted, setMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+
 
   /* Auto height */
   const contentRef = useRef(null);
@@ -39,12 +44,34 @@ const RulesModal = ({ onClose }) => {
 
   const totalSteps = Math.ceil(RULES.length / RULES_PER_STEP);
 
+  const highlightRuleText = (text, ruleStartIndex) => {
+    if (spokenIndex === null) return text;
+
+    const start = Math.max(0, spokenIndex - ruleStartIndex);
+    const end = Math.min(text.length, start);
+
+    if (start <= 0) return text;
+
+    return (
+      <>
+        <span className="bg-yellow-200 transition-colors duration-150">
+          {text.slice(0, start)}
+        </span>
+        <span>{text.slice(start)}</span>
+      </>
+    );
+  };
+
+
+
+
   /* 🔊 SPEAK (STABLE) */
   const speak = async (text) => {
     if (muted) return;
 
     await loadVoices();
     speechSynthesis.cancel();
+    setSpokenIndex(0);
 
     const mobile = isMobile();
     const voices = cachedVoices;
@@ -59,8 +86,24 @@ const RulesModal = ({ onClose }) => {
     msg.rate = 0.95;
 
     msg.onstart = () => setIsSpeaking(true);
-    msg.onend = () => setIsSpeaking(false);
-    msg.onerror = () => setIsSpeaking(false);
+    msg.onend = () => {
+      setIsSpeaking(false);
+      setSpokenIndex(null);
+    };
+    msg.onerror = () => {
+      setIsSpeaking(false);
+      setSpokenIndex(null);
+    };
+
+
+    // 🔥 HIGHLIGHT TRACKING
+
+    msg.onboundary = (e) => {
+      if (e.name !== "word") return;
+      const adjustedIndex = Math.max(0, e.charIndex - 1);
+      setSpokenIndex(adjustedIndex);
+    };
+
 
     if (lang === "ta") {
       msg.lang = "ta-IN";
@@ -73,8 +116,13 @@ const RulesModal = ({ onClose }) => {
     speechSynthesis.speak(msg);
   };
 
+
   /* 📐 Auto height */
   useEffect(() => {
+    speechSynthesis.cancel();
+    setSpokenIndex(null);
+    setIsSpeaking(false);
+
     if (contentRef.current) {
       setContentHeight(contentRef.current.scrollHeight);
     }
@@ -117,13 +165,16 @@ const RulesModal = ({ onClose }) => {
   const speakCurrentStep = () => {
     if (muted) return;
 
-    const text = RULES
-      .slice(step * RULES_PER_STEP, step * RULES_PER_STEP + RULES_PER_STEP)
-      .map(r => r[lang])
-      .join(". ");
+    const rules = RULES.slice(
+      step * RULES_PER_STEP,
+      step * RULES_PER_STEP + RULES_PER_STEP
+    );
+
+    const text = rules.map(r => r[lang]).join(". ");
 
     speak(text);
   };
+
 
 
   /* Navigation */
@@ -194,6 +245,21 @@ const RulesModal = ({ onClose }) => {
     onClose();
   };
 
+
+  useEffect(() => {
+    // 🔒 lock background scroll
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overscrollBehavior = "contain";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // 🔓 restore scroll
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = "";
+    };
+  }, []);
+
+
   const disableTamilTTS = lang === "ta" && !isMobile();
 
   return (
@@ -239,7 +305,27 @@ const RulesModal = ({ onClose }) => {
                       key={i}
                       className="bg-gray-100 p-3 rounded-md text-sm wrap-break-word leading-relaxed"
                     >
-                      {rule[lang]}
+                      {(() => {
+                        const rulesBefore = RULES
+                          .slice(step * RULES_PER_STEP, step * RULES_PER_STEP + i)
+                          .map(r => r[lang])
+                          .join(". ");
+
+                        const ruleStartIndex = rulesBefore.length
+                          ? rulesBefore.length + 2 // ". "
+                          : 0;
+
+                        return isSpeaking
+                          ? (
+                            <p >
+                              {highlightRuleText(rule[lang], ruleStartIndex)}
+                            </p>
+                          )
+                          : (
+                            <p className="px-0.5">{rule[lang]}</p>
+                          )
+                      })()}
+
                     </div>
                   ))}
                 </div>
