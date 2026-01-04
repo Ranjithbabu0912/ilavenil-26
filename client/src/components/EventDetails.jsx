@@ -48,13 +48,7 @@ const EventDetails = () => {
             >
                 <div className="absolute inset-0 bg-black/70" />
 
-                <div className="relative text-center px-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="absolute left-4 -top-10 flex items-center gap-2 text-gray-300 hover:text-white"
-                    >
-                        <ArrowLeft size={18} /> Back
-                    </button>
+                <div className="relative flex flex-col items-center text-center px-4">
 
                     <h1 className="text-4xl md:text-6xl text-white font-bold">
                         {event.name}
@@ -64,14 +58,21 @@ const EventDetails = () => {
                         {event.desc}
                     </p>
 
-                    <button className="mt-6 px-8 py-3 bg-primary rounded-full hover:bg-blue-600 text-white hover:scale-105 active:scale-90 transition cursor-pointer" onClick={user ? () => navigate('/register') : openSignIn}>
+                    <button className="mt-6 px-8 py-3 bg-primary rounded-full hover:bg-blue-600 text-white hover:scale-105 active:scale-90 transition cursor-pointer mb-3" onClick={user ? () => navigate('/register') : openSignIn}>
                         Register Now
+                    </button>
+
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex cursor-pointer items-center gap-2 bg- text-gray-300 hover:text-white"
+                    >
+                        <ArrowLeft size={18} /> Back
                     </button>
                 </div>
             </div>
 
             {/* INFO */}
-            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 py-10 px-6 border-b border-black/30">
+            <div className="max-w-6xl    mx-auto flex flex-col md:grid grid-cols-2 md:grid-cols-4 gap-6 py-10 px-6 border-b border-black/30">
                 <Info icon={<CalendarDays />} label="Date" value={"23 JAN 2026"} />
                 <Info icon={<Clock />} label="Time" value={event.time} />
                 <Info icon={<MapPin />} label="Venue" value={event.location} />

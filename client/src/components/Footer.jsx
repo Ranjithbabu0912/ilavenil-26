@@ -40,7 +40,7 @@ const Footer = () => {
                 <div className='flerx flex-col gap-3  list-none '>
                     <h2 className='text-2xl font-bold mb-3 text-primary'>Contact Info</h2>
                     <div className='flex flex-col gap-3'>
-                        <li><a href="mailto:ilavenil26@gmail.com">ilavenil26@gmail.com</a></li>
+                        <li><a href="mailto:committee.ilavenil26@gmail.com">committee.ilavenil26@gmail.com</a></li>
                         <li><a href="tel:+919043100583">+91 90431 00583</a></li>
                         <li>G.T.N. Arts college, Old Karur Road, Dindigul, Tamil Nadu, India.</li>
                     </div>
@@ -58,7 +58,7 @@ const Footer = () => {
                             <p className='bg-primary h-10 w-10 rounded-full text-white flex items-center justify-center'><GithubIcon className='' /></p>
                         </a>
                     </div>
-                    <p className='text-gray-600 text-sm'>© 2026 Intercollegiate meet. All rights reserved. Design and Developed by <span className='text-primary text-lg'>Ranjith Babu S</span></p>
+                    <p className='text-gray-600 text-sm'>© {new Date().getFullYear()} ILAVENIL'26. All rights reserved. Design and Developed by <span className='text-primary text-lg'>Ranjith Babu S</span></p>
                 </div>
             </div>
         </div>
