@@ -84,7 +84,7 @@ const Contact = () => {
                     <InfoCard
                         icon={<Clock />}
                         title="Support Time"
-                        value="9:00 AM – 6:00 PM"
+                        value="9:00 AM – 9:00 PM"
                     />
                     <InfoCard
                         icon={<MapPin />}
