@@ -83,10 +83,14 @@ const AdminRegistrationsTable = () => {
         const excelData = filtered.map((r) => ({
             Name: r.name,
             Event: formatEvents(r.events),
-            PaymentStatus: r.payment?.status || "",
-            UTR: r.payment?.utr || "",
             Email: r.email,
             Contact: r.contact || "",
+            CollegeName: r.collegeName || "",
+            Department: r.discipline || "",
+            YearOfStudy: r.year || "",
+            CollegeCity: r.collegeCity || "",
+            PaymentStatus: r.payment?.status || "",
+            UTR: r.payment?.utr || "",
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(excelData);

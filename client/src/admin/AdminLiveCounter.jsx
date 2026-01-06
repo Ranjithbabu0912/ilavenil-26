@@ -71,7 +71,7 @@ const AdminDailyDashboard = () => {
             {/* 📊 DAILY BAR CHART */}
             <div className="bg-white p-4 rounded-xl shadow">
                 <h3 className="text-lg font-bold mb-3 text-center">
-                    Daily Registrations (01 Jan – 22 Jan 2026)
+                    Daily Registrations (05 Jan – 22 Jan 2026)
                 </h3>
 
                 <ResponsiveContainer width="100%" height={320}>

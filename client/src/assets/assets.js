@@ -345,7 +345,7 @@ export const contactInfo = [
         phone: "919043100583"
     },
     {
-        title: "Deepak Kumar S",
+        title: "Deepak Kumar V",
         name: "Student Coordinator",
         phone: "917845541693"
     },

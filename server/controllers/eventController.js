@@ -127,7 +127,7 @@ export const getDailyRegistrationStats = async (req, res) => {
   try {
     await connectDB();
 
-    const startDate = new Date("2026-01-01T00:00:00.000Z");
+    const startDate = new Date("2026-01-05T00:00:00.000Z");
     const endDate = new Date("2026-01-22T23:59:59.999Z");
 
     const result = await EventRegistration.aggregate([

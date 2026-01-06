@@ -249,6 +249,21 @@ const AdminDashboard = () => {
                                 </span>
                             </p>
 
+                            <p className="text-sm mt-1">
+                                {reg.payment?.screenshotUrl ? (
+                                    <a
+                                        href={reg.payment.screenshotUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        View Screenshot
+                                    </a>
+                                ) : (
+                                    "-"
+                                )}
+                            </p>
+
                             {activeTab === "REJECTED" && reg.payment?.rejectedReason && (
                                 <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
                                     <p className="text-xs font-semibold text-red-700">
