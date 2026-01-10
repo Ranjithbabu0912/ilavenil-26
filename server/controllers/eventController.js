@@ -1,74 +1,103 @@
 import connectDB from "../config/db.js";
 import EventRegistration from "../models/eventRegistration.js";
+import Team from "../models/Team.js";
+import { isTeamRequired } from "../utils/eventValidation.js";
 
-const GROUP_EVENTS = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Yourspark"];
+// const GROUP_EVENTS = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Yourspark"];
 
 /* ================= CREATE REGISTRATION ================= */
 
 export const createRegistration = async (req, res) => {
   try {
+
     await connectDB();
 
     const {
-      email,
+      name,
       gender,
+      contact,
+      email,
+      collegeName,
+      discipline,
       collegeCity,
+      year,
+      soloOrGroup,
       teamName,
       events,
     } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ success: false, message: "Email required" });
-    }
+    const selectedEvents = Object.values(events).filter(Boolean);
 
-    // 🔐 prevent duplicate email
-    const existingRegistration = await EventRegistration.findOne({ email });
-    if (existingRegistration) {
-      return res.status(409).json({
-        success: false,
-        message: "This email is already registered",
+    // 🔴 Team validation
+    const teamNeeded = isTeamRequired({ events, soloOrGroup });
+
+    let teamDoc = null;
+
+    if (teamNeeded) {
+      const groupEvent =
+        selectedEvents.find(e => e !== "Yourspark") || "Yourspark";
+
+      // 🔍 Find existing team
+      teamDoc = await Team.findOne({
+        event: groupEvent,
+        teamName: teamName.trim(),
       });
+
+      // 🆕 Create team if not exists
+      if (!teamDoc) {
+        teamDoc = await Team.create({
+          event: groupEvent,
+          teamName: teamName.trim(),
+          members: [],
+        });
+      }
+
+      // 🚫 Team size limit
+      if (teamDoc.members.length >= teamDoc.maxSize) {
+        return res.status(400).json({
+          success: false,
+          message: "Team size limit reached",
+        });
+      }
     }
 
-    // ✅ basic required field checks
-    if (!gender || !collegeCity) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required participant details",
-      });
-    }
-
-    // ✅ group event → team name required
-    const isGroupEvent =
-      GROUP_EVENTS.includes(events?.primary) ||
-      GROUP_EVENTS.includes(events?.secondary);
-
-    if (isGroupEvent && !teamName) {
-      return res.status(400).json({
-        success: false,
-        message: "Team name is required for group events",
-      });
-    }
-
+    // ✅ Save registration
     const registration = await EventRegistration.create({
-      ...req.body,
-      teamName: isGroupEvent ? teamName : null,
-      payment: { status: "NOT_PAID" },
+      name,
+      gender,
+      contact,
+      email,
+      collegeName,
+      discipline,
+      collegeCity,
+      year,
+      soloOrGroup,
+      teamName: teamNeeded ? teamName.trim() : null,
+      events,
+      team: teamDoc?._id || null,
+      status: "NOT_PAID",
     });
+
+    // 🔗 Attach member to team
+    if (teamDoc) {
+      teamDoc.members.push(registration._id);
+      await teamDoc.save();
+    }
 
     return res.status(201).json({
       success: true,
       registrationId: registration._id,
+      teamId: teamDoc?._id || null,
     });
 
-  } catch (error) {
-    console.error("createRegistration error:", error);
+  } catch (err) {
+    console.error(err);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Server error",
     });
   }
-};
+}
 
 /* ================= CHECK PAYMENT STATUS ================= */
 

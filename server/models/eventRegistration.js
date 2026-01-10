@@ -61,6 +61,11 @@ const eventRegistrationSchema = new mongoose.Schema(
             },
             lastRetriedAt: Date,
         },
+        team: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Team",
+            default: null,
+        },
 
         qrToken: {
             type: String,
