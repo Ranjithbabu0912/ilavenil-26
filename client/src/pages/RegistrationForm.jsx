@@ -18,13 +18,12 @@ const eventsList = [
 // group events (participants > 1)
 const groupEvents = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Yourspark"];
 
+
 const RegistrationForm = () => {
 
     const [loading, setLoading] = useState(false);
     const { user, isLoaded, isSignedIn } = useUser();
     const navigate = useNavigate();
-
-    const isMobile = window.innerWidth <= 768;
 
     const loggedInEmail = user?.primaryEmailAddress?.emailAddress;
     const API_URL = import.meta.env.VITE_API_URL;
@@ -35,7 +34,11 @@ const RegistrationForm = () => {
         groupEvents.includes(e)
     );
 
+    const isYoursparkSelected = selectedEvents.includes("Yourspark");
+
+
     const genderOptions = ["Male", "Female", "Other"];
+
 
     const departmentOptions = [
         "BA (General)",
@@ -130,6 +133,7 @@ const RegistrationForm = () => {
 
     const [formData, setFormData] = useState({
         name: "",
+        gender: "",
         contact: "",
         collegeName: "",
         discipline: "",
@@ -137,8 +141,10 @@ const RegistrationForm = () => {
         collegeCity: "",
         collegeCityOther: "",
         year: "",
+        soloOrGroup: "",
         teamName: "",
     });
+
 
 
 
@@ -154,12 +160,14 @@ const RegistrationForm = () => {
         }
     };
 
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -176,10 +184,20 @@ const RegistrationForm = () => {
             return;
         }
 
-        if (isGroupEventSelected && !formData.teamName.trim()) {
+        const isTeamRequired =
+            isGroupEventSelected &&
+            (
+                !isYoursparkSelected ||
+                (isYoursparkSelected && formData.soloOrGroup === "group")
+            );
+
+        if (isTeamRequired && !formData.teamName.trim()) {
             toast.error("Team name is required for group events");
             return;
         }
+
+
+
 
         const payload = {
             ...formData,
@@ -203,7 +221,8 @@ const RegistrationForm = () => {
                 secondary: selectedEvents[1] || null,
             },
 
-            teamName: isGroupEventSelected ? formData.teamName : null,
+            teamName: isTeamRequired ? formData.teamName : null,
+
         };
 
 
@@ -231,6 +250,7 @@ const RegistrationForm = () => {
     };
 
     const userEmail = user?.primaryEmailAddress?.emailAddress || null;
+
 
     useEffect(() => {
         if (!isLoaded) return;
@@ -439,23 +459,60 @@ const RegistrationForm = () => {
                 {/* Team Name */}
                 {isGroupEventSelected && (
                     <>
-                        <label className="font-semibold text-lg">
-                            Team Name <span className="text-xs text-gray-500">(Group events only)</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="teamName"
-                            required
-                            className="border p-2 rounded"
-                            onChange={handleChange}
-                        />
-                        <p className="text-xs -mt-2 text-gray-500">
-                            Kindly enter the same team name for all team members
-                        </p>
+                        {isYoursparkSelected && (
+                            <>
+                                <label className="font-semibold text-lg">
+                                    Select Participation Type
+                                </label>
+
+                                <div className="flex gap-6">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="soloOrGroup"
+                                            value="solo"
+                                            required
+                                            onChange={handleChange}
+                                        />
+                                        Solo
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="soloOrGroup"
+                                            value="group"
+                                            required
+                                            onChange={handleChange}
+                                        />
+                                        Group
+                                    </label>
+                                </div>
+
+                            </>
+                        )
+                        }
+                        <>
+                            {
+                                formData.soloOrGroup === "group" && (
+                                    <>
+                                        <label className="font-semibold text-lg">Team Name <span className="text-xs text-gray-500">(Group events only)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="teamName"
+                                            required={formData.soloOrGroup === "group"}
+                                            className="border p-2 rounded"
+                                            onChange={handleChange}
+                                        />
+
+                                        <p className="text-xs -mt-2 text-gray-500"> Kindly enter the same team name for all team members </p>
+                                    </>
+                                )
+                            }
+                        </>
                     </>
                 )}
-
-
 
 
 

@@ -3,10 +3,9 @@ import { useAuth } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
 
-
-
 const API_URL = import.meta.env.VITE_API_URL;
 
+/* ---------------- STATUS BADGE ---------------- */
 const StatusBadge = ({ status }) => {
     const map = {
         PENDING: "bg-yellow-100 text-yellow-800",
@@ -24,25 +23,32 @@ const StatusBadge = ({ status }) => {
     );
 };
 
+/* ---------------- MAIN COMPONENT ---------------- */
 const AdminRegistrationsTable = () => {
     const { getToken } = useAuth();
+
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
+    const [filters, setFilters] = useState({
+        event: "",
+        teamName: "",
+        college: "",
+        city: "",
+    });
+
+    /* ---------------- LOAD DATA ---------------- */
     const loadData = async () => {
         try {
             setLoading(true);
             const token = await getToken({ template: "admin-template" });
 
-            const res = await fetch(
-                `${API_URL}/api/events/all-registration`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const res = await fetch(`${API_URL}/api/events/all-registration`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             const json = await res.json();
             setData(json.registrations || []);
@@ -57,23 +63,70 @@ const AdminRegistrationsTable = () => {
         loadData();
     }, []);
 
-    const filtered = data.filter((r) =>
-        [r.name, r.email, r.payment?.utr, r.contact]
+    /* ---------------- UNIQUE FILTER VALUES ---------------- */
+    const uniqueEvents = [
+        ...new Set(
+            data.flatMap((r) =>
+                [r.events?.primary, r.events?.secondary].filter(Boolean)
+            )
+        ),
+    ];
+
+    const uniqueColleges = [
+        ...new Set(data.map((r) => r.collegeName).filter(Boolean)),
+    ];
+
+    const uniqueCities = [
+        ...new Set(data.map((r) => r.collegeCity).filter(Boolean)),
+    ];
+
+    /* ---------------- FILTERED DATA ---------------- */
+    const filtered = data.filter((r) => {
+        const searchText = search.toLowerCase();
+
+        const matchesSearch = [
+            r.name,
+            r.email,
+            r.payment?.utr,
+            r.contact,
+        ]
             .join(" ")
             .toLowerCase()
-            .includes(search.toLowerCase())
-    );
+            .includes(searchText);
 
+        const matchesEvent =
+            !filters.event ||
+            r.events?.primary === filters.event ||
+            r.events?.secondary === filters.event;
+
+        const matchesTeam =
+            !filters.teamName ||
+            r.teamName?.toLowerCase().includes(filters.teamName.toLowerCase());
+
+        const matchesCollege =
+            !filters.college || r.collegeName === filters.college;
+
+        const matchesCity =
+            !filters.city || r.collegeCity === filters.city;
+
+        return (
+            matchesSearch &&
+            matchesEvent &&
+            matchesTeam &&
+            matchesCollege &&
+            matchesCity
+        );
+    });
+
+    /* ---------------- HELPERS ---------------- */
     const formatEvents = (events) => {
         if (!events) return "";
-
-        if (events.secondary) {
-            return `${events.primary}, ${events.secondary}`;
-        }
-
-        return events.primary || "";
+        return events.secondary
+            ? `${events.primary}, ${events.secondary}`
+            : events.primary || "";
     };
 
+    /* ---------------- EXPORT EXCEL ---------------- */
     const exportExcel = () => {
         if (!filtered.length) {
             toast.error("No data to export");
@@ -82,29 +135,25 @@ const AdminRegistrationsTable = () => {
 
         const excelData = filtered.map((r) => ({
             Name: r.name,
+            TeamName: r.teamName || "",
             Event: formatEvents(r.events),
             Email: r.email,
             Contact: r.contact || "",
-            CollegeName: r.collegeName || "",
+            College: r.collegeName || "",
             Department: r.discipline || "",
-            YearOfStudy: r.year || "",
-            CollegeCity: r.collegeCity || "",
+            Year: r.year || "",
+            City: r.collegeCity || "",
             PaymentStatus: r.payment?.status || "",
             UTR: r.payment?.utr || "",
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
-
         XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
-
         XLSX.writeFile(workbook, "registrations.xlsx");
     };
 
-
-
-
-
+    /* ---------------- LOADING ---------------- */
     if (loading) {
         return (
             <div className="text-center py-20 text-gray-500">
@@ -113,44 +162,102 @@ const AdminRegistrationsTable = () => {
         );
     }
 
-
+    /* ---------------- UI ---------------- */
     return (
         <div className="p-4 md:mt-24 max-w-7xl mx-auto">
             <h1 className="text-2xl font-bold mb-4">All Registrations</h1>
 
-            {/* 🔍 Search */}
-            <div className="sticky top-0 bg-white z-10 pb-3">
+            {/* SEARCH */}
+            <input
+                type="text"
+                placeholder="Search name / email / UTR / contact"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="border px-4 py-2 rounded w-full md:w-96 mb-4"
+            />
+
+            {/* FILTERS */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                <select
+                    className="border px-3 py-2 rounded"
+                    value={filters.event}
+                    onChange={(e) =>
+                        setFilters({ ...filters, event: e.target.value })
+                    }
+                >
+                    <option value="">All Events</option>
+                    {uniqueEvents.map((e) => (
+                        <option key={e} value={e}>{e}</option>
+                    ))}
+                </select>
+
                 <input
                     type="text"
-                    placeholder="Search name / email / UTR / contact"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="border px-4 py-2 rounded w-full md:w-96"
+                    placeholder="Team name"
+                    className="border px-3 py-2 rounded"
+                    value={filters.teamName}
+                    onChange={(e) =>
+                        setFilters({ ...filters, teamName: e.target.value })
+                    }
                 />
+
+                <select
+                    className="border px-3 py-2 rounded"
+                    value={filters.college}
+                    onChange={(e) =>
+                        setFilters({ ...filters, college: e.target.value })
+                    }
+                >
+                    <option value="">All Colleges</option>
+                    {uniqueColleges.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                    ))}
+                </select>
+
+                <select
+                    className="border px-3 py-2 rounded"
+                    value={filters.city}
+                    onChange={(e) =>
+                        setFilters({ ...filters, city: e.target.value })
+                    }
+                >
+                    <option value="">All Cities</option>
+                    {uniqueCities.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                    ))}
+                </select>
             </div>
 
+            {/* ACTIONS */}
             <div className="flex gap-3 mb-4">
                 <button
+                    onClick={() =>
+                        setFilters({ event: "", teamName: "", college: "", city: "" })
+                    }
+                    className="border px-4 py-2 rounded text-sm"
+                >
+                    Clear Filters
+                </button>
+
+                <button
                     onClick={exportExcel}
-                    className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded text-sm"
+                    className="bg-blue-600 text-white px-4 py-2 rounded text-sm"
                 >
                     Export Excel
                 </button>
             </div>
 
-
-
-            {/* ================= DESKTOP TABLE ================= */}
-            <div className="hidden md:block mt-4 overflow-x-auto bg-white rounded-lg shadow">
-                <table className="min-w-full border-collapse">
+            {/* DESKTOP TABLE */}
+            <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow">
+                <table className="min-w-full">
                     <thead className="bg-gray-100 text-sm">
                         <tr>
                             <th className="px-4 py-3 text-left">Name</th>
+                            <th className="px-4 py-3 text-left">Team</th>
                             <th className="px-4 py-3 text-left">Events</th>
                             <th className="px-4 py-3 text-left">Payment</th>
                             <th className="px-4 py-3 text-left">UTR</th>
                             <th className="px-4 py-3 text-left">Email</th>
-                            <th className="px-4 py-3 text-left">Screenshot</th>
                         </tr>
                     </thead>
 
@@ -158,9 +265,8 @@ const AdminRegistrationsTable = () => {
                         {filtered.map((r) => (
                             <tr key={r._id} className="border-t hover:bg-gray-50">
                                 <td className="px-4 py-3 font-medium">{r.name}</td>
-                                <td className="px-4 py-3">
-                                    {formatEvents(r.events)}
-                                </td>
+                                <td className="px-4 py-3">{r.teamName || "-"}</td>
+                                <td className="px-4 py-3">{formatEvents(r.events)}</td>
                                 <td className="px-4 py-3">
                                     <StatusBadge status={r.payment?.status} />
                                 </td>
@@ -168,20 +274,6 @@ const AdminRegistrationsTable = () => {
                                     {r.payment?.utr || "-"}
                                 </td>
                                 <td className="px-4 py-3">{r.email}</td>
-                                <td className="px-4 py-3">
-                                    {r.payment?.screenshotUrl ? (
-                                        <a
-                                            href={r.payment.screenshotUrl}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-blue-600 underline"
-                                        >
-                                            View
-                                        </a>
-                                    ) : (
-                                        "-"
-                                    )}
-                                </td>
                             </tr>
                         ))}
 
@@ -196,53 +288,22 @@ const AdminRegistrationsTable = () => {
                 </table>
             </div>
 
-            {/* ================= MOBILE CARDS ================= */}
+            {/* MOBILE CARDS */}
             <div className="md:hidden mt-4 space-y-4">
                 {filtered.map((r) => (
-                    <div
-                        key={r._id}
-                        className="bg-white rounded-xl shadow p-4 border space-y-2"
-                    >
-                        <div className="flex justify-between items-center">
-                            <h3 className="font-semibold text-lg">{r.name}</h3>
+                    <div key={r._id} className="bg-white p-4 rounded shadow border">
+                        <div className="flex justify-between">
+                            <h3 className="font-semibold">{r.name}</h3>
                             <StatusBadge status={r.payment?.status} />
                         </div>
-
-                        <p className="text-sm text-gray-600">{r.email}</p>
-
-                        <p className="text-sm">
-                            <b>Event:</b> {formatEvents(r.events)}
-                        </p>
-
-                        <p className="text-sm">
-                            <b>UTR:</b>{" "}
-                            <span className="font-mono">
-                                {r.payment?.utr || "-"}
-                            </span>
-                        </p>
-
-                        {r.payment?.screenshotUrl && (
-                            <a
-                                href={r.payment.screenshotUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-block mt-2 text-blue-600 underline text-sm"
-                            >
-                                View Screenshot
-                            </a>
-                        )}
+                        <p className="text-sm">Team: {r.teamName || "-"}</p>
+                        <p className="text-sm">Event: {formatEvents(r.events)}</p>
+                        <p className="text-sm font-mono">UTR: {r.payment?.utr || "-"}</p>
                     </div>
                 ))}
-
-                {filtered.length === 0 && (
-                    <p className="text-center text-gray-500 py-10">
-                        No registrations found
-                    </p>
-                )}
             </div>
         </div>
     );
 };
 
 export default AdminRegistrationsTable;
-

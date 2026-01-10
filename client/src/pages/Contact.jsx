@@ -74,7 +74,7 @@ const Contact = () => {
                     <InfoCard
                         icon={<Mail />}
                         title="Email"
-                        value="help.ilavenil26@gmail.com"
+                        value="committee.ilavenil26@gmail.com"
                     />
                     <InfoCard
                         icon={<Phone />}

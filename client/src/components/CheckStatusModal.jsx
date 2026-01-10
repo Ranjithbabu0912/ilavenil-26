@@ -66,7 +66,7 @@ const CheckStatusModal = ({ onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white p-6 rounded-lg w-80 shadow-2xl relative">
 
                 <button

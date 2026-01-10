@@ -16,6 +16,7 @@ const PaymentSkeleton = () => (
 );
 
 /* ================= SEARCH HIGHLIGHT ================= */
+
 const highlightText = (text = "", query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
