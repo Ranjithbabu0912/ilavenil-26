@@ -6,7 +6,14 @@ import { attachUser } from "../middlewares/attachUser.js";
 // import { clerkProtect } from '../middlewares/authMiddleware.js';
 // import { attachUser } from "../middlewares/attachUser.js";
 
+import cors from "cors";
+
 const router = express.Router();
+
+router.options("/manual/:id", cors());
+router.options("/payment/retry", cors());
+
+
 
 router.post(
     "/manual/:id",
