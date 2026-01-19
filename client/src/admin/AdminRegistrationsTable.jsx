@@ -258,6 +258,7 @@ const AdminRegistrationsTable = () => {
                             <th className="px-4 py-3 text-left">Payment</th>
                             <th className="px-4 py-3 text-left">UTR</th>
                             <th className="px-4 py-3 text-left">Email</th>
+                            <th className="px-4 py-3 text-left">Screenshot</th>
                         </tr>
                     </thead>
 
@@ -274,6 +275,7 @@ const AdminRegistrationsTable = () => {
                                     {r.payment?.utr || "-"}
                                 </td>
                                 <td className="px-4 py-3">{r.email}</td>
+                                <td className="px-4 py-3 text-blue-600"> <a href={r.payment.screenshotUrl} target="_blank">View</a></td>
                             </tr>
                         ))}
 
@@ -299,6 +301,20 @@ const AdminRegistrationsTable = () => {
                         <p className="text-sm">Team: {r.teamName || "-"}</p>
                         <p className="text-sm">Event: {formatEvents(r.events)}</p>
                         <p className="text-sm font-mono">UTR: {r.payment?.utr || "-"}</p>
+                        <p className="text-sm font-mono">
+                                {r.payment?.screenshotUrl ? (
+                                    <a
+                                        href={r.payment.screenshotUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        View Screenshot
+                                    </a>
+                                ) : (
+                                    "-"
+                                )}
+                            </p>
                     </div>
                 ))}
             </div>
