@@ -298,7 +298,7 @@ const AdminRegistrationsTable = () => {
                             <h3 className="font-semibold">{r.name}</h3>
                             <StatusBadge status={r.payment?.status} />
                         </div>
-                        <p className="text-sm">Team: {r.teamName || "-"}</p>
+                        <p className="text-sm">Team: {r.teamName || "Solo"}</p>
                         <p className="text-sm">Event: {formatEvents(r.events)}</p>
                         <p className="text-sm font-mono">UTR: {r.payment?.utr || "-"}</p>
                         <p className="text-sm font-mono">

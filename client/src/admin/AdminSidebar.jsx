@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { CreditCard, QrCode, LogOut, X, ChartArea, NotepadText } from "lucide-react";
+import { CreditCard, QrCode, LogOut, X, ChartArea, NotepadText, NotebookPen } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 
 const AdminSidebar = ({ open, setOpen }) => {
@@ -91,6 +91,18 @@ const AdminSidebar = ({ open, setOpen }) => {
                     >
                         <QrCode size={20} />
                         QR Attendance
+                    </NavLink>
+
+                    <NavLink
+                        to="/admin/onspot"
+                        className={({ isActive }) =>
+                            `${baseLink} ${isActive ? active : "text-gray-700 hover:bg-indigo-100"
+                            }`
+                        }
+                        onClick={() => setOpen(false)}
+                    >
+                        <NotebookPen size={20} />
+                        On Spot Registration
                     </NavLink>
 
 

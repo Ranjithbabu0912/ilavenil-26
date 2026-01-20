@@ -24,6 +24,8 @@ export const createRegistration = async (req, res) => {
       soloOrGroup,
       teamName,
       events,
+      mode,
+      registeredBy
     } = req.body;
 
     const selectedEvents = Object.values(events).filter(Boolean);
@@ -61,6 +63,9 @@ export const createRegistration = async (req, res) => {
       }
     }
 
+    const isOnSpot = mode === "ONSPOT";
+
+
     // ✅ Save registration
     const registration = await EventRegistration.create({
       name,
@@ -75,7 +80,24 @@ export const createRegistration = async (req, res) => {
       teamName: teamNeeded ? teamName.trim() : null,
       events,
       team: teamDoc?._id || null,
-      status: "NOT_PAID",
+
+      mode: isOnSpot ? "ONSPOT" : "ONLINE",
+
+      registeredBy,
+
+      payment: isOnSpot
+        ? {
+          method: req.body.payment.method, // CASH / UPI
+          status: "APPROVED",
+          paidAt: new Date(),
+        }
+        : {
+          status: "NOT_PAID",
+        },
+
+      status: isOnSpot ? "APPROVED" : "NOT_PAID",
+
+
     });
 
     // 🔗 Attach member to team
@@ -83,6 +105,13 @@ export const createRegistration = async (req, res) => {
       teamDoc.members.push(registration._id);
       await teamDoc.save();
     }
+
+    if (isOnSpot) {
+      const { sendConfirmationMail } = await import("../utils/sendConfirmationMail.js");
+      await sendConfirmationMail(registration);
+    }
+
+
 
     return res.status(201).json({
       success: true,
@@ -117,7 +146,15 @@ export const checkPaymentStatus = async (req, res) => {
       return res.status(200).json({ success: false });
     }
 
-    const status = registration.payment?.status || "NOT_PAID";
+    if (registration.mode === "ONSPOT") {
+      return res.status(200).json({
+        success: true,
+        status: "PAID",
+        registrationId: registration._id,
+        mode: "ONSPOT",
+      });
+    }
+
 
     return res.status(200).json({
       success: true,

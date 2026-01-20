@@ -6,7 +6,7 @@ import { useUser } from "@clerk/clerk-react";
 
 const eventsList = [
     { name: "CorpIQ", type: "2" },
-    { name: "Market Mania", type: "2" },
+    { name: "Market Mania", type: "5" },
     { name: "Zero Bug", type: "1" },
     { name: "Webify", type: "2" },
     { name: "IPL Auction", type: "2" },
@@ -167,6 +167,23 @@ const RegistrationForm = () => {
             [e.target.name]: e.target.value,
         });
     };
+
+
+
+    // mandatory group events except Yourspark
+    const hasMandatoryGroupEvent = selectedEvents.some(
+        e => groupEvents.includes(e) && e !== "Yourspark"
+    );
+
+    // only Yourspark selected
+    const isOnlyYourspark =
+        selectedEvents.length === 1 && selectedEvents[0] === "Yourspark";
+
+    // team name required ONLY in these cases
+    const isTeamRequired =
+        hasMandatoryGroupEvent ||
+        (isOnlyYourspark && formData.soloOrGroup === "group");
+
 
 
     const handleSubmit = async (e) => {
@@ -457,60 +474,60 @@ const RegistrationForm = () => {
                 </div>
 
                 {/* Team Name */}
-                {isGroupEventSelected && (
+                {/* Solo / Group choice ONLY for Yourspark */}
+                {isOnlyYourspark && (
                     <>
-                        {isYoursparkSelected && (
-                            <>
-                                <label className="font-semibold text-lg">
-                                    Select Participation Type
-                                </label>
+                        <label className="font-semibold text-lg">
+                            Select Participation Type
+                        </label>
 
-                                <div className="flex gap-6">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="soloOrGroup"
-                                            value="solo"
-                                            required
-                                            onChange={handleChange}
-                                        />
-                                        Solo
-                                    </label>
+                        <div className="flex gap-6">
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="soloOrGroup"
+                                    value="solo"
+                                    checked={formData.soloOrGroup === "solo"}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                Solo
+                            </label>
 
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="soloOrGroup"
-                                            value="group"
-                                            required
-                                            onChange={handleChange}
-                                        />
-                                        Group
-                                    </label>
-                                </div>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="soloOrGroup"
+                                    value="group"
+                                    checked={formData.soloOrGroup === "group"}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                Group
+                            </label>
+                        </div>
+                    </>
+                )}
 
-                            </>
-                        )
-                        }
-                        <>
-                            {
-                                formData.soloOrGroup === "group" && (
-                                    <>
-                                        <label className="font-semibold text-lg">Team Name <span className="text-xs text-gray-500">(Group events only)</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="teamName"
-                                            required={formData.soloOrGroup === "group"}
-                                            className="border p-2 rounded"
-                                            onChange={handleChange}
-                                        />
+                {/* Team Name – ONLY when required */}
+                {isTeamRequired && (
+                    <>
+                        <label className="font-semibold text-lg">
+                            Team Name <span className="text-xs text-gray-500">(Group events only)</span>
+                        </label>
 
-                                        <p className="text-xs -mt-2 text-gray-500"> Kindly enter the same team name for all team members </p>
-                                    </>
-                                )
-                            }
-                        </>
+                        <input
+                            type="text"
+                            name="teamName"
+                            value={formData.teamName}
+                            onChange={handleChange}
+                            required
+                            className="border p-2 rounded"
+                        />
+
+                        <p className="text-xs -mt-2 text-gray-500">
+                            Kindly enter the same team name for all team members
+                        </p>
                     </>
                 )}
 

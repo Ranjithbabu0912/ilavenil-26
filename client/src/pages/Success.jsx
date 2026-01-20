@@ -19,7 +19,7 @@ const Success = () => {
                 alert("Registration ID missing");
                 return;
             }
-            navigate(`/payment/${registrationId}`);
+            navigate(`/admin/onspot`);
         }
     };
 

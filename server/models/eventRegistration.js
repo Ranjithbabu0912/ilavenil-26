@@ -5,7 +5,6 @@ const eventRegistrationSchema = new mongoose.Schema(
     {
         name: { type: String, required: true, trim: true },
 
-        // ✅ NEW
         gender: {
             type: String,
             enum: ["Male", "Female", "Other"],
@@ -16,18 +15,14 @@ const eventRegistrationSchema = new mongoose.Schema(
         email: { type: String, required: true, trim: true, lowercase: true },
         collegeName: { type: String, required: true },
 
-        // 🔁 discipline → kept for backward compatibility
         discipline: { type: String, required: true },
-
-        // ✅ NEW
         collegeCity: { type: String, required: true },
 
         year: { type: String, required: true },
 
-        // ✅ NEW (optional)
         teamName: {
             type: String,
-            default: null,
+            default: "Solo",
             trim: true,
         },
 
@@ -36,31 +31,52 @@ const eventRegistrationSchema = new mongoose.Schema(
             secondary: { type: String, default: null },
         },
 
+        // 🔥 ONLINE vs ONSPOT
+        mode: {
+            type: String,
+            enum: ["ONLINE", "ONSPOT"],
+            default: "ONLINE",
+        },
+
+        // 🔥 REGISTRATION STATUS
+        status: {
+            type: String,
+            enum: ["NOT_PAID", "APPROVED", "REJECTED"],
+            default: "NOT_PAID",
+        },
+
+        // 🔥 WHO REGISTERED (ADMIN EMAIL)
+        registeredBy: {
+            type: String,
+            trim: true,
+            lowercase: true,
+            default: null, // null for ONLINE
+        },
+
         payment: {
             method: {
                 type: String,
-                enum: ["UPI"],
+                enum: ["UPI", "CASH"],
+                required: true,
                 default: "UPI",
             },
             utr: { type: String, trim: true },
             screenshotUrl: { type: String, default: null },
             screenshotPublicId: { type: String, default: null },
+
             status: {
                 type: String,
                 enum: ["NOT_PAID", "PENDING", "APPROVED", "REJECTED"],
                 default: "NOT_PAID",
             },
+
             rejectionReason: { type: String, default: null },
-            rejectedAt: {
-                type: Date,
-                default: null,
-            },
-            retryCount: {
-                type: Number,
-                default: 0,
-            },
+            rejectedAt: Date,
+            retryCount: { type: Number, default: 0 },
             lastRetriedAt: Date,
+            paidAt: Date,
         },
+
         team: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Team",
@@ -76,7 +92,7 @@ const eventRegistrationSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// indexes unchanged
+// 🔐 Indexes
 eventRegistrationSchema.index(
     { "payment.utr": 1 },
     { unique: true, sparse: true }
@@ -87,6 +103,7 @@ eventRegistrationSchema.index(
     { unique: true }
 );
 
+// 🎟️ Auto QR token
 eventRegistrationSchema.pre("save", function () {
     if (!this.qrToken) {
         this.qrToken = crypto.randomBytes(16).toString("hex");

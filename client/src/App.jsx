@@ -26,6 +26,7 @@ import ScrollToTop from "./components/ScrollTop";
 import AdminLiveCounter from "./admin/AdminLiveCounter";
 import AdminRegistrationsTable from "./admin/AdminRegistrationsTable";
 import RulesModal from "./components/RulesModal/RulesModal";
+import AdminOnSpot from "./admin/AdminOnSpot";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -126,6 +127,13 @@ const App = () => {
             path="applications"
             element={
               <AdminRegistrationsTable />
+            }
+          />
+
+          <Route
+            path="onspot"
+            element={
+              <AdminOnSpot />
             }
           />
 
