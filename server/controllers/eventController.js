@@ -146,22 +146,28 @@ export const checkPaymentStatus = async (req, res) => {
       return res.status(200).json({ success: false });
     }
 
+    // On-spot registrations are always paid
     if (registration.mode === "ONSPOT") {
       return res.status(200).json({
         success: true,
         status: "PAID",
         registrationId: registration._id,
+        paymentRequired: false,
         mode: "ONSPOT",
       });
     }
 
+    // ✅ DEFINE STATUS SAFELY
+    const status = registration.payment?.status || "NOT_PAID";
 
     return res.status(200).json({
       success: true,
       status,
       registrationId: registration._id,
 
-      // 🔴 ONLY SEND THIS WHEN REJECTED
+      // 👇 IMPORTANT FOR TEAM LOGIC
+      paymentRequired: registration.isTeamLeader ?? true,
+
       rejectionReason:
         status === "REJECTED"
           ? registration.payment?.rejectionReason || "Payment rejected"
@@ -170,9 +176,10 @@ export const checkPaymentStatus = async (req, res) => {
 
   } catch (err) {
     console.error("checkPaymentStatus error:", err);
-    return res.status(200).json({ success: false });
+    return res.status(500).json({ success: false });
   }
 };
+
 
 
 /* ================= GET ALL REGISTRATIONS ================= */

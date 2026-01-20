@@ -256,6 +256,7 @@ const RegistrationForm = () => {
 
             if (data.success) {
                 navigate(`/success?page=register&rid=${data.registrationId}`);
+                localStorage.setItem("registeredEmail", data.registrationId);
             } else {
                 toast.error(data.message);
             }
@@ -292,7 +293,7 @@ const RegistrationForm = () => {
                 if (data.success) {
                     toast.info("You are already registered");
 
-                    if (data.status === "NOT_PAID" || data.status === "REJECTED") {
+                    if (data.payment.status === "NOT_PAID" || data.payment.status === "REJECTED") {
                         navigate(`/payment/${data.registrationId}`);
                     } else {
                         navigate("/");
