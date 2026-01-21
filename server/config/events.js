@@ -1,13 +1,13 @@
 // config/events.js
 export const EVENTS = {
-    CorpIQ: { type: "group" },
+    "CorpIQ": { type: "group" },
     "Market Mania": { type: "group" },
-    Webify: { type: "group" },
+    "Webify": { type: "group" },
     "IPL Auction": { type: "group" },
 
     "Zero Bug": { type: "solo" },
     "Mind Maze": { type: "solo" },
-    Up2date: { type: "solo" },
+    "World Watch": { type: "solo" },
 
-    Yourspark: { type: "hybrid" }, // solo or group
+    "Skillspark": { type: "hybrid" }, // solo or group
 };

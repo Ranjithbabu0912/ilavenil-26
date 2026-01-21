@@ -3,7 +3,7 @@ import EventRegistration from "../models/eventRegistration.js";
 import Team from "../models/Team.js";
 import { isTeamRequired } from "../utils/eventValidation.js";
 
-// const GROUP_EVENTS = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Yourspark"];
+// const GROUP_EVENTS = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Skillspark"];
 
 /* ================= CREATE REGISTRATION ================= */
 
@@ -37,7 +37,7 @@ export const createRegistration = async (req, res) => {
 
     if (teamNeeded) {
       const groupEvent =
-        selectedEvents.find(e => e !== "Yourspark") || "Yourspark";
+        selectedEvents.find(e => e !== "Skillspark") || "Skillspark";
 
       // 🔍 Find existing team
       teamDoc = await Team.findOne({

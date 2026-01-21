@@ -6,17 +6,17 @@ import { useUser } from "@clerk/clerk-react";
 
 const eventsList = [
     { name: "CorpIQ", type: "2" },
-    { name: "Market Mania", type: "5" },
+    { name: "Market Mania", type: "2" },
     { name: "Zero Bug", type: "1" },
     { name: "Webify", type: "2" },
     { name: "IPL Auction", type: "2" },
     { name: "Mind Maze", type: "1" },
-    { name: "Up2date", type: "1" },
-    { name: "Yourspark", type: "max 5" },
+    { name: "World Watch", type: "1" },
+    { name: "Skillspark", type: "max 5" },
 ];
 
 // group events (participants > 1)
-const groupEvents = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Yourspark"];
+const groupEvents = ["CorpIQ", "Market Mania", "Webify", "IPL Auction", "Skillspark"];
 
 
 const RegistrationForm = () => {
@@ -34,7 +34,7 @@ const RegistrationForm = () => {
         groupEvents.includes(e)
     );
 
-    const isYoursparkSelected = selectedEvents.includes("Yourspark");
+    const isSkillsparkSelected = selectedEvents.includes("Skillspark");
 
 
     const genderOptions = ["Male", "Female", "Other"];
@@ -170,19 +170,19 @@ const RegistrationForm = () => {
 
 
 
-    // mandatory group events except Yourspark
+    // mandatory group events except Skillspark
     const hasMandatoryGroupEvent = selectedEvents.some(
-        e => groupEvents.includes(e) && e !== "Yourspark"
+        e => groupEvents.includes(e) && e !== "Skillspark"
     );
 
-    // only Yourspark selected
-    const isOnlyYourspark =
-        selectedEvents.length === 1 && selectedEvents[0] === "Yourspark";
+    // only Skillspark selected
+    const isOnlySkillspark =
+        selectedEvents.length === 1 && selectedEvents[0] === "Skillspark";
 
     // team name required ONLY in these cases
     const isTeamRequired =
         hasMandatoryGroupEvent ||
-        (isOnlyYourspark && formData.soloOrGroup === "group");
+        (isOnlySkillspark && formData.soloOrGroup === "group");
 
 
 
@@ -204,8 +204,8 @@ const RegistrationForm = () => {
         const isTeamRequired =
             isGroupEventSelected &&
             (
-                !isYoursparkSelected ||
-                (isYoursparkSelected && formData.soloOrGroup === "group")
+                !isSkillsparkSelected ||
+                (isSkillsparkSelected && formData.soloOrGroup === "group")
             );
 
         if (isTeamRequired && !formData.teamName.trim()) {
@@ -475,8 +475,8 @@ const RegistrationForm = () => {
                 </div>
 
                 {/* Team Name */}
-                {/* Solo / Group choice ONLY for Yourspark */}
-                {isOnlyYourspark && (
+                {/* Solo / Group choice ONLY for Skillspark */}
+                {isOnlySkillspark && (
                     <>
                         <label className="font-semibold text-lg">
                             Select Participation Type
