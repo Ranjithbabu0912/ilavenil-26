@@ -41,11 +41,11 @@ export const eventDetails = [
         banner: "/marketMania.png",
         name: "Market Mania",
         desc: "Tests participant's selling and convincing skills by pitching a product with creativity, strategy, and confidence.",
-        noOfPart: 5,
+        noOfPart: 2,
         time: "10:30 AM - 12:30 PM",
         location: "MBA Class Room",
         rules: [
-            "Five participants per team",
+            "Two participants per team",
             "A product will be provided by the organizers",
             "Emphasis should be on innovation, persuasion, and practicality",
             "Use of props is permitted",
