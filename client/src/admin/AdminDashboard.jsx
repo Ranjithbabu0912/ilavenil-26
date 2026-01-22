@@ -84,7 +84,7 @@ const AdminDashboard = () => {
     const [loadingId, setLoadingId] = useState(null);
 
     const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
 
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -265,13 +265,13 @@ const AdminDashboard = () => {
                                 )}
                             </p>
 
-                            {activeTab === "REJECTED" && reg.payment?.rejectedReason && (
+                            {activeTab === "REJECTED" && reg.payment?.rejectionReason && (
                                 <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
                                     <p className="text-xs font-semibold text-red-700">
                                         Rejection Reason
                                     </p>
                                     <p className="text-sm text-red-600 mt-1">
-                                        {reg.payment.rejectedReason}
+                                        {reg.payment.rejectionReason}
                                     </p>
                                 </div>
                             )}

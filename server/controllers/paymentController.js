@@ -100,8 +100,13 @@ export const retryPayment = async (req, res) => {
     registration.payment.utr = utr;
     registration.payment.screenshotUrl = screenshotUrl;
     registration.payment.status = "PENDING";
+
+    registration.payment.rejectionReason = null;
+    registration.payment.rejectedAt = null;
+
     registration.payment.retryCount += 1;
     registration.payment.lastRetriedAt = new Date();
+
 
     await registration.save();
 
