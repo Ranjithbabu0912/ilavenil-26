@@ -7,6 +7,7 @@ A full-stack web application built to manage inter-college event registrations, 
 ## 🚀 Features
 
 ### 👤 User Features
+
 - User authentication using **Clerk**
 - Event registration
 - Secure payment submission
@@ -17,6 +18,7 @@ A full-stack web application built to manage inter-college event registrations, 
 - QR-based attendance check-in
 
 ### 🛡️ Admin Features
+
 - Admin-only dashboard
 - View all registrations & payments
 - Search by name / email / UTR
@@ -30,6 +32,7 @@ A full-stack web application built to manage inter-college event registrations, 
 ## 🧰 Tech Stack
 
 ### Frontend
+
 - React + Vite
 - Tailwind CSS
 - React Router
@@ -37,6 +40,7 @@ A full-stack web application built to manage inter-college event registrations, 
 - HTML5 QR Code Scanner
 
 ### Backend
+
 - Node.js
 - Express.js
 - MongoDB + Mongoose
@@ -44,41 +48,57 @@ A full-stack web application built to manage inter-college event registrations, 
 - Cloudinary (image uploads)
 
 ### Deployment
+
 - Frontend: Vercel
 - Backend: Vercel / Render
 - Database: MongoDB Atlas
 
 ---
 
-## 📸 Screenshots (Optional)
+## 📸 Screenshots
 
->Add screenshots of:
-> - Home page
-> - Registration
-> - Payment page
-> - Admin dashboard
-> - QR scanner
+### Home Page
+
+![Home Page](screenshots/home.png)
+
+### About Page
+
+![About Page](screenshots/about.png)
+
+### Events Page
+
+![Events Page](screenshots/events.png)
+
+### Contact Page
+
+![Contact Page](screenshots/contact.png)
+
+### Admin Panel
+
+![Admin Panel](screenshots/admin.png)
 
 ---
 
 ## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the repository
+
 ```bash
 git clone https://github.com/Ranjithbabu0912/ilavenil-26.git
 cd ilavenil-26
 ```
+
 ### 2️⃣ Install dependencies
 
 ```Frontend
 cd client
 npm install
 ```
+
 ```Backend
 cd server
 npm install
 ```
-
 
 ### 🔐 Environment Variables
 
@@ -98,8 +118,8 @@ CLOUDINARY_API_KEY=xxx
 CLOUDINARY_API_SECRET=xxx
 ```
 
-
 ### ▶️ Running the Project
+
 ```Backend
 cd server
 npm run dev
@@ -110,22 +130,24 @@ cd client
 npm run dev
 ```
 
-
 ### 🛡️ Admin Access
+
 > To access admin routes:
 
 > - Login using Clerk
 > - Set publicMetadata in Clerk Dashboard:
+
 ```
 {
   "role": "admin"
 }
 ```
+
 > - Logout & login again
 
-
 ### 📁 Folder Structure
-``` text
+
+```text
 client/
  ├─ components/
  ├─ pages/
@@ -151,15 +173,11 @@ server/
 > - Analytics dashboard
 > - Multi-event QR passes
 
-
-
 ### 👨‍💻 Author
 
 Ranjith Babu \
 Full-Stack Web Developer \
 📧 ranjithbabu.dev@gmail.com
-
-
 
 ### 📄 License
 
